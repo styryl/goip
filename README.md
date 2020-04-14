@@ -95,6 +95,8 @@ $server->run();
 
 # Sending SMS usage instructions
 
+**Send sms by socket UDP protocol**
+
 ```php
 $sms = new \Pikart\Goip\Sms\SocketSms(
     '192.168.0.11', // GoIP host
@@ -121,6 +123,24 @@ $server->listenAll(function ( \Pikart\Goip\Message $message ){
 
 $server->run();
 ```
+**Send sms by HTTP protocol**
+
+```php
+$sms = new \Pikart\Goip\Sms\HttpSms('http://192.168.0.11',1,'admin','admin');
+$response = $sms->send(999999999, 'test message');
+```
+
+The response will be contains array:
+
+```php
+array(3) {
+  ["id"]=>string(8) "00001893"
+  ["raw"]=>string(45) "Sending,L1 Send SMS to:695772577; ID:00001893"
+  ["status"]=>string(4) "send"
+}
+```
+
+If sms will be not send, the** \Pikart\Goip\Exceptions\GoipException::class** will be thrown.
 
 
 
