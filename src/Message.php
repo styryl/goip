@@ -4,7 +4,7 @@ namespace Pikart\Goip;
 
 abstract class Message
 {
-    protected Request $request;
+    private Request $request;
 
     public function __construct( Request $request )
     {
