@@ -21,7 +21,7 @@ $server = \Pikart\Goip\ServerFactory::default( \Pikart\Goip\ReactServer::class, 
 
 Static method **ServerFactory::default** takes three arguments:
 
-1. Implementation \Pikart\Goip\ServerFactory (**string**)
+1. Implementation \Pikart\Goip\Server (**string**)
     Raw PHP **\Pikart\Goip\UdpServer::class**
     ```PHP
     $server = \Pikart\Goip\ServerFactory::default( \Pikart\Goip\UdpServer::class, '0.0.0.0', 333);
