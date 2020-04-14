@@ -9,8 +9,8 @@ use ReflectionClass;
 
 class ServerFactory implements ServerFactoryContract
 {
-    protected MessageFactory $messageFactory;
-    protected MessageDispatcher $messageDispatcher;
+    private MessageFactory $messageFactory;
+    private MessageDispatcher $messageDispatcher;
 
     public function __construct( MessageFactory $messageFactory, MessageDispatcher $messageDispatcher )
     {
