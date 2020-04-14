@@ -1,7 +1,7 @@
 {
     "name": "pikart/goip",
-    "description": "Goip SMS Gateway Client / Server and Laravel implementation",
-    "keywords": ["laravel","sms","goip","gateway","client","server"],
+    "description": "Goip server and client",
+    "keywords": ["sms","goip","gateway","client","server"],
     "license": "MIT",
     "authors": [
         {
