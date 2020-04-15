@@ -18,6 +18,12 @@ class DeliverMessageTest extends TestCase
         $this->message = new DeliverMessage( $this->request );
     }
 
+    public function testItCanReturnAck() : void
+    {
+        $this->assertEquals( "DELIVER ".$this->request->get('deliver').' OK', $this->message->ack() );
+        $this->assertIsInt( $this->message->deliver() );
+    }
+
     public function testItCanReturnDeliver() : void
     {
         $this->assertEquals( $this->request->get('deliver'), $this->message->deliver() );

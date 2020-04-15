@@ -18,6 +18,12 @@ class RequestMessageTest extends TestCase
         $this->message = new RequestMessage( $this->request );
     }
 
+    public function testItCanReturnAck() : void
+    {
+        $this->assertEquals( "REQUEST ".$this->request->get('req').' OK', $this->message->ack() );
+        $this->assertIsInt( $this->message->req() );
+    }
+
     public function testItCanReturnReq() : void
     {
         $this->assertEquals( $this->request->get('req'), $this->message->req() );
