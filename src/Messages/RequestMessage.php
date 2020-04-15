@@ -6,7 +6,7 @@ class RequestMessage extends Message
 {
     public function ack(): ? string
     {
-        return "RECORD ".$this->request()->get('req').' OK';
+        return "REQUEST ".$this->request()->get('req').' OK';
     }
 
     public function req() : ? int
