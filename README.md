@@ -183,7 +183,7 @@ $sms = new SocketSms(
     '192.168.0.11',
     9991,
     123,
-    'passwod',
+    'password',
     ['timeout' => 30]
 );
 
@@ -234,13 +234,13 @@ $sms = new HttpSms('http://192.168.0.11',1, 'admin', 'admin');
 * @return array
 * @throws GoipException
 */
-$response = $sms->send('695772577', 'text message');
+$response = $sms->send('999999999', 'text message');
 
 var_dump( $response );
 
 array(3) {
     ["id"]=> string(8) "0000021f" // send id
-    ["raw"]=> string(45) "Sending,L1 Send SMS to:695772577; ID:0000021f" // Raw response
+    ["raw"]=> string(45) "Sending,L1 Send SMS to:999999999; ID:0000021f" // Raw response
     ["status"]=> string(4) "send" // send status
 }
 ```
