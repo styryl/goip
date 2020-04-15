@@ -58,14 +58,14 @@ class ServerFactory implements ServerFactoryContract
     /**
      * Resolve Server instance
      *
-     * @param string $serverBuilderClass
+     * @param string $serverClass
      * @param array $args
      * @return Server
      * @throws \ReflectionException
      */
-    private function resolve( string $serverBuilderClass, array $args = [] ) : Server
+    private function resolve( string $serverClass, array $args = [] ) : Server
     {
-        $reflection = new ReflectionClass($serverBuilderClass);
+        $reflection = new ReflectionClass($serverClass);
         return ( $reflection->getConstructor() ) ? $reflection->newInstanceArgs($args) : $reflection->newInstance();
     }
 
