@@ -19,7 +19,13 @@ class ReceiveMessageTest extends TestCase
         $this->message = new ReceiveMessage( $this->request );
     }
 
-    public function testItCanReturnHangup() : void
+    public function testItCanReturnAck() : void
+    {
+        $this->assertEquals( "RECEIVE ".$this->request->get('receive').' OK', $this->message->ack() );
+        $this->assertIsInt( $this->message->receive() );
+    }
+
+    public function testItCanReturnReceive() : void
     {
         $this->assertEquals( $this->request->get('receive'), $this->message->receive() );
         $this->assertIsInt( $this->message->receive() );

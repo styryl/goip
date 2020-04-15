@@ -10,21 +10,21 @@ class StateMessage extends Message
         return "STATE ".$this->request()->get('state').' OK';
     }
 
+    /**
+     * Get state count number
+     *
+     * @return int|null
+     */
     public function state() : ? int
     {
         return $this->request()->get('state');
     }
 
-    public function id() : ? string
-    {
-        return $this->request()->get('id');
-    }
-
-    public function password() : ? string
-    {
-        return $this->request()->get('password');
-    }
-
+    /**
+     * Get GSM line state
+     *
+     * @return string|null
+     */
     public function gsmRemainState() : ? string
     {
         return $this->request()->get('gsm_remain_state');

@@ -18,6 +18,12 @@ class StateMessageTest extends TestCase
         $this->message = new StateMessage( $this->request );
     }
 
+    public function testItCanReturnAck() : void
+    {
+        $this->assertEquals( "STATE ".$this->request->get('state').' OK', $this->message->ack() );
+        $this->assertIsInt( $this->message->state() );
+    }
+
     public function testItCanReturnState() : void
     {
         $this->assertEquals( $this->request->get('state'), $this->message->state() );

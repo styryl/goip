@@ -18,6 +18,12 @@ class RequestMessageTest extends TestCase
         $this->message = new RequestMessage( $this->request );
     }
 
+    public function testItCanReturnAck() : void
+    {
+        $this->assertEquals( "REQUEST ".$this->request->get('req').' OK', $this->message->ack() );
+        $this->assertIsInt( $this->message->req() );
+    }
+
     public function testItCanReturnReq() : void
     {
         $this->assertEquals( $this->request->get('req'), $this->message->req() );
@@ -30,10 +36,10 @@ class RequestMessageTest extends TestCase
         $this->assertIsString( $this->message->id() );
     }
 
-    public function testItCanReturnPass() : void
+    public function testItCanReturnPassword() : void
     {
-        $this->assertEquals( $this->request->get('pass'), $this->message->pass() );
-        $this->assertIsString( $this->message->pass() );
+        $this->assertEquals( $this->request->get('pass'), $this->message->password() );
+        $this->assertIsString( $this->message->password() );
     }
 
     public function testItCanReturnNum() : void

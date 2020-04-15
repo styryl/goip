@@ -9,14 +9,27 @@ use React\EventLoop\LoopInterface;
 
 class ReactServer extends Server
 {
+    /**
+     * The Socket instance
+     *
+     * @var Socket
+     */
     private Socket $socket;
 
+    /**
+     * Run server
+     */
     public function run(): void
     {
         $loop = $this->createSocket();
         $loop->run();
     }
 
+    /**
+     * Create socket server
+     *
+     * @return LoopInterface
+     */
     private function createSocket() : LoopInterface
     {
         $loop = LoopFactory::create();
@@ -33,6 +46,12 @@ class ReactServer extends Server
         return $loop;
     }
 
+    /**
+     * Fire when message arrives
+     *
+     * @param string $message
+     * @param string $address
+     */
     private function onMessage( string $message, string $address ) : void
     {
         $addressArr = explode(':', $address);
@@ -44,6 +63,13 @@ class ReactServer extends Server
         $this->dispatch( $request );
     }
 
+    /**
+     * Send message to client
+     *
+     * @param string $message
+     * @param string $host
+     * @param int $port
+     */
     protected function send(string $message, string $host, int $port ): void
     {
         $this->socket->send( $message, $host.':'.$port );

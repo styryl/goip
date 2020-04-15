@@ -18,6 +18,12 @@ class RecordMessageTest extends TestCase
         $this->message = new RecordMessage( $this->request );
     }
 
+    public function testItCanReturnAck() : void
+    {
+        $this->assertEquals( "RECORD ".$this->request->get('record').' OK', $this->message->ack() );
+        $this->assertIsInt( $this->message->record() );
+    }
+
     public function testItCanReturnRecord() : void
     {
         $this->assertEquals( $this->request->get('record'), $this->message->record() );

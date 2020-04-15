@@ -18,6 +18,12 @@ class HangupMessageTest extends TestCase
         $this->message = new HangupMessage( $this->request );
     }
 
+    public function testItCanReturnAck() : void
+    {
+        $this->assertEquals( "HANGUP ".$this->request->get('hangup').' OK', $this->message->ack() );
+        $this->assertIsInt( $this->message->hangup() );
+    }
+
     public function testItCanReturnHangup() : void
     {
         $this->assertEquals( $this->request->get('hangup'), $this->message->hangup() );
