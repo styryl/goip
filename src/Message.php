@@ -42,6 +42,26 @@ abstract class Message
     }
 
     /**
+     * Get goip id
+     *
+     * @return string|null
+     */
+    public function id() : ? string
+    {
+        return $this->request()->get('id');
+    }
+
+    /**
+     * Goip password
+     *
+     * @return string|null
+     */
+    public function password() : ? string
+    {
+        return $this->request()->get('password');
+    }
+
+    /**
      * Get ACK message
      *
      * @return string|null

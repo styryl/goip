@@ -24,26 +24,6 @@ class ReceiveMessage extends Message
     }
 
     /**
-     * Goip id
-     *
-     * @return string|null
-     */
-    public function id() : ? string
-    {
-        return $this->request()->get('id');
-    }
-
-    /**
-     * Goip password
-     *
-     * @return string|null
-     */
-    public function password() : ? string
-    {
-        return $this->request()->get('password');
-    }
-
-    /**
      * Sender phone number
      *
      * @return int|null

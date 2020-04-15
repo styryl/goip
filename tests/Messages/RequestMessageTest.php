@@ -36,10 +36,10 @@ class RequestMessageTest extends TestCase
         $this->assertIsString( $this->message->id() );
     }
 
-    public function testItCanReturnPass() : void
+    public function testItCanReturnPassword() : void
     {
-        $this->assertEquals( $this->request->get('pass'), $this->message->pass() );
-        $this->assertIsString( $this->message->pass() );
+        $this->assertEquals( $this->request->get('pass'), $this->message->password() );
+        $this->assertIsString( $this->message->password() );
     }
 
     public function testItCanReturnNum() : void
