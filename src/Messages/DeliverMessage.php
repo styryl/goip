@@ -26,26 +26,6 @@ class DeliverMessage extends Message
     }
 
     /**
-     * Goip gateway id
-     *
-     * @return string|null
-     */
-    public function id() : ? string
-    {
-        return $this->request()->get('id');
-    }
-
-    /**
-     * Goip password
-     *
-     * @return string|null
-     */
-    public function password() : ? string
-    {
-        return $this->request()->get('password');
-    }
-
-    /**
      * Sms count number
      *
      * @return int|null

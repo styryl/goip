@@ -25,21 +25,11 @@ class RequestMessage extends Message
     }
 
     /**
-     * Get Goip id
+     * Get goip password
      *
      * @return string|null
      */
-    public function id() : ? string
-    {
-        return $this->request()->get('id');
-    }
-
-    /**
-     * Get Goip password
-     *
-     * @return string|null
-     */
-    public function pass() : ? string
+    public function password(): ?string
     {
         return $this->request()->get('pass');
     }

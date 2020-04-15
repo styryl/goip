@@ -21,26 +21,6 @@ class StateMessage extends Message
     }
 
     /**
-     * Get goip id
-     *
-     * @return string|null
-     */
-    public function id() : ? string
-    {
-        return $this->request()->get('id');
-    }
-
-    /**
-     * Get goip password
-     *
-     * @return string|null
-     */
-    public function password() : ? string
-    {
-        return $this->request()->get('password');
-    }
-
-    /**
      * Get GSM line state
      *
      * @return string|null
