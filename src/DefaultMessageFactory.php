@@ -13,6 +13,11 @@ use Pikart\Goip\Messages\StateMessage;
 
 class DefaultMessageFactory implements MessageFactory
 {
+    /**
+     * The available message types
+     *
+     * @var array
+     */
     protected array $messages = [
         'req'     => RequestMessage::class,
         'state'   => StateMessage::class,
@@ -22,6 +27,12 @@ class DefaultMessageFactory implements MessageFactory
         'deliver' => DeliverMessage::class,
     ];
 
+    /**
+     * Make concrete message from Request
+     *
+     * @param Request $request
+     * @return Message
+     */
     public function make(Request $request): Message
     {
         // First key of parsed buffer is type of message
