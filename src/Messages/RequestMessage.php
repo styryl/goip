@@ -11,7 +11,7 @@ class RequestMessage extends Message
      */
     public function ack(): ? string
     {
-        return "REQUEST ".$this->request()->get('req').' OK';
+        return 'req:'.$this->request()->get('req').';status:200;';
     }
 
     /**
