@@ -1,7 +1,14 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Pikart\Goip\Messages;
+
 use Pikart\Goip\Message;
 
+/**
+ * @package Pikart\Goip\Messages
+ */
 class RequestMessage extends Message
 {
     /**
@@ -9,9 +16,9 @@ class RequestMessage extends Message
      *
      * @return string|null
      */
-    public function ack(): ? string
+    public function ack(): ?string
     {
-        return "REQUEST ".$this->request()->get('req').' OK';
+        return "REQUEST " . $this->request()->get('req') . ' OK';
     }
 
     /**
@@ -19,9 +26,9 @@ class RequestMessage extends Message
      *
      * @return int|null
      */
-    public function req() : ? int
+    public function req(): ?int
     {
-        return $this->request()->get('req');
+        return $this->request()->getAsInt('req');
     }
 
     /**
@@ -39,7 +46,7 @@ class RequestMessage extends Message
      *
      * @return string|null
      */
-    public function num() : ? string
+    public function num(): ?string
     {
         return $this->request()->get('num');
     }
@@ -49,9 +56,9 @@ class RequestMessage extends Message
      *
      * @return int|null
      */
-    public function signal() : ? int
+    public function signal(): ?int
     {
-        return $this->request()->get('signal');
+        return $this->request()->getAsInt('signal');
     }
 
     /**
@@ -59,7 +66,7 @@ class RequestMessage extends Message
      *
      * @return string|null
      */
-    public function gsmStatus() : ? string
+    public function gsmStatus(): ?string
     {
         return $this->request()->get('gsm_status');
     }
@@ -69,7 +76,7 @@ class RequestMessage extends Message
      *
      * @return string|null
      */
-    public function voipStatus() : ? string
+    public function voipStatus(): ?string
     {
         return $this->request()->get('voip_status');
     }
@@ -79,7 +86,7 @@ class RequestMessage extends Message
      *
      * @return string|null
      */
-    public function voipState() : ? string
+    public function voipState(): ?string
     {
         return $this->request()->get('voip_state');
     }
@@ -89,9 +96,9 @@ class RequestMessage extends Message
      *
      * @return int|null
      */
-    public function remainTime() : ? int
+    public function remainTime(): ?int
     {
-        return $this->request()->get('remain_time');
+        return $this->request()->getAsInt('remain_time');
     }
 
     /**
@@ -99,15 +106,15 @@ class RequestMessage extends Message
      *
      * @return int|null
      */
-    public function imei() : ? int
+    public function imei(): ?int
     {
-        return $this->request()->get('imei');
+        return $this->request()->getAsInt('imei');
     }
 
     /**
      * @return string|null
      */
-    public function pro() : ? string
+    public function pro(): ?string
     {
         return $this->request()->get('pro');
     }
@@ -116,9 +123,9 @@ class RequestMessage extends Message
      * Get IDLE time
      * @return int|null
      */
-    public function idle() : ? int
+    public function idle(): ?int
     {
-        return $this->request()->get('idle');
+        return $this->request()->getAsInt('idle');
     }
 
     /**
@@ -126,9 +133,9 @@ class RequestMessage extends Message
      *
      * @return int|null
      */
-    public function disableStatus() : ? int
+    public function disableStatus(): ?int
     {
-        return $this->request()->get('disable_status');
+        return $this->request()->getAsInt('disable_status');
     }
 
     /**
@@ -136,7 +143,7 @@ class RequestMessage extends Message
      *
      * @return string|null
      */
-    public function smsLogin() : ? string
+    public function smsLogin(): ?string
     {
         return $this->request()->get('sms_login');
     }
@@ -146,7 +153,7 @@ class RequestMessage extends Message
      *
      * @return string|null
      */
-    public function smbLogin() : ? string
+    public function smbLogin(): ?string
     {
         return $this->request()->get('smb_login');
     }
@@ -156,7 +163,7 @@ class RequestMessage extends Message
      *
      * @return string|null
      */
-    public function cellinfo() : ? string
+    public function cellinfo(): ?string
     {
         return $this->request()->get('cellinfo');
     }
@@ -166,7 +173,7 @@ class RequestMessage extends Message
      *
      * @return string|null
      */
-    public function cgatt() : ? string
+    public function cgatt(): ?string
     {
         return $this->request()->get('cgatt');
     }

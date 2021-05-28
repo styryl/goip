@@ -1,10 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pikart\Goip;
 
 use Pikart\Goip\Contracts\MessageDispatcher;
 use Pikart\Goip\Contracts\MessageFactory;
 
+/**
+ * @package Pikart\Goip
+ */
 abstract class Server
 {
     /**
@@ -47,7 +52,7 @@ abstract class Server
      *
      * @param int $port
      */
-    public function setPort( int $port ) : void
+    public function setPort(int $port): void
     {
         $this->port = $port;
     }
@@ -57,7 +62,7 @@ abstract class Server
      *
      * @param string $host
      */
-    public function setHost( string $host ) : void
+    public function setHost(string $host): void
     {
         $this->host = $host;
     }
@@ -67,7 +72,7 @@ abstract class Server
      *
      * @param MessageDispatcher $dispatcher
      */
-    public function setMessageDispatcher( MessageDispatcher $dispatcher ) : void
+    public function setMessageDispatcher(MessageDispatcher $dispatcher): void
     {
         $this->messageDispatcher = $dispatcher;
     }
@@ -77,7 +82,7 @@ abstract class Server
      *
      * @param MessageFactory $factory
      */
-    public function setMessageFactory( MessageFactory $factory ) : void
+    public function setMessageFactory(MessageFactory $factory): void
     {
         $this->messageFactory = $factory;
     }
@@ -85,7 +90,7 @@ abstract class Server
     /**
      * Stop server
      */
-    public function stop() : void
+    public function stop(): void
     {
         $this->stop = true;
     }
@@ -97,9 +102,9 @@ abstract class Server
      * @param object $listener
      * @return string
      */
-    public function listen( string $type, object $listener ): string
+    public function listen(string $type, object $listener): string
     {
-        return $this->messageDispatcher->listen( $type, $listener );
+        return $this->messageDispatcher->listen($type, $listener);
     }
 
     /**
@@ -108,19 +113,19 @@ abstract class Server
      * @param object $listener
      * @return string
      */
-    public function listenAll( object $listener ) : string
+    public function listenAll(object $listener): string
     {
-        return $this->messageDispatcher->listenAll(  $listener );
+        return $this->messageDispatcher->listenAll($listener);
     }
 
     /**
      * Remove message listener by id
      *
-     * @param string $id
+     * @param string $listenerIdentifier
      */
-    public function off( string $id ): void
+    public function off(string $listenerIdentifier): void
     {
-        $this->messageDispatcher->remove( $id );
+        $this->messageDispatcher->remove($listenerIdentifier);
     }
 
     /**
@@ -128,7 +133,7 @@ abstract class Server
      *
      * @return MessageDispatcher
      */
-    public function dispatcher() : MessageDispatcher
+    public function dispatcher(): MessageDispatcher
     {
         return $this->messageDispatcher;
     }
@@ -138,22 +143,21 @@ abstract class Server
      *
      * @param Request $request
      */
-    protected function dispatch( Request $request ) : void
+    protected function dispatch(Request $request): void
     {
-        $message = $this->messageFactory->make( $request );
+        $message = $this->messageFactory->make($request);
 
-        if( $message->ack() )
-        {
-            $this->send( $message->ack(), $message->request()->host(), $message->request()->port() );
+        if (!is_null($message->ack())) {
+            $this->send($message->ack() ?? "", $message->request()->host(), $message->request()->port());
         }
 
-        $this->messageDispatcher->dispatch( $message );
+        $this->messageDispatcher->dispatch($message);
     }
 
     /**
      * Run server
      */
-    abstract public function run() : void;
+    abstract public function run(): void;
 
     /**
      * Send message to client
@@ -162,5 +166,5 @@ abstract class Server
      * @param string $host
      * @param int $port
      */
-    abstract protected function send( string $message, string $host, int $port ) : void;
+    abstract protected function send(string $message, string $host, int $port): void;
 }

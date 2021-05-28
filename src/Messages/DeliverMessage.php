@@ -1,8 +1,15 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Pikart\Goip\Messages;
 
 use Pikart\Goip\Message;
 
+/**
+ * Class DeliverMessage
+ * @package Pikart\Goip\Messages
+ */
 class DeliverMessage extends Message
 {
     /**
@@ -10,9 +17,9 @@ class DeliverMessage extends Message
      *
      * @return string|null
      */
-    public function ack() : ? string
+    public function ack(): ?string
     {
-        return "DELIVER ".$this->request()->get('deliver').' OK';
+        return "DELIVER " . $this->request()->get('deliver') . ' OK';
     }
 
     /**
@@ -20,9 +27,9 @@ class DeliverMessage extends Message
      *
      * @return int|null
      */
-    public function deliver() : ? int
+    public function deliver(): ?int
     {
-        return $this->request()->get('deliver');
+        return $this->request()->getAsInt('deliver');
     }
 
     /**
@@ -30,9 +37,9 @@ class DeliverMessage extends Message
      *
      * @return int|null
      */
-    public function smsNo() : ? int
+    public function smsNo(): ?int
     {
-        return $this->request()->get('sms_no');
+        return $this->request()->getAsInt('sms_no');
     }
 
     /**
@@ -40,9 +47,9 @@ class DeliverMessage extends Message
      *
      * @return int|null
      */
-    public function state() : ? int
+    public function state(): ?int
     {
-        return $this->request()->get('state');
+        return $this->request()->getAsInt('state');
     }
 
     /**
@@ -50,7 +57,7 @@ class DeliverMessage extends Message
      *
      * @return string|null
      */
-    public function num() : ? string
+    public function num(): ?string
     {
         return $this->request()->get('num');
     }

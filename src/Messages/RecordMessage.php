@@ -1,8 +1,14 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Pikart\Goip\Messages;
 
 use Pikart\Goip\Message;
 
+/**
+ * @package Pikart\Goip\Messages
+ */
 class RecordMessage extends Message
 {
     /**
@@ -10,9 +16,9 @@ class RecordMessage extends Message
      *
      * @return string|null
      */
-    public function ack(): ? string
+    public function ack(): ?string
     {
-        return "RECORD ".$this->request()->get('record').' OK';
+        return "RECORD " . $this->request()->get('record') . ' OK';
     }
 
     /**
@@ -20,17 +26,17 @@ class RecordMessage extends Message
      *
      * @return int|null
      */
-    public function record() : ? int
+    public function record(): ?int
     {
-        return $this->request()->get('record');
+        return $this->request()->getAsInt('record');
     }
 
     /**
      * @return int|null
      */
-    public function dir() : ? int
+    public function dir(): ?int
     {
-        return $this->request()->get('dir');
+        return $this->request()->getAsInt('dir');
     }
 
     /**
@@ -38,7 +44,7 @@ class RecordMessage extends Message
      *
      * @return string|null
      */
-    public function num() : ? string
+    public function num(): ?string
     {
         return $this->request()->get('num');
     }

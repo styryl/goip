@@ -1,7 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pikart\Goip;
 
+/**
+ * Class Message
+ * @package Pikart\Goip
+ */
 abstract class Message
 {
     /**
@@ -16,7 +22,7 @@ abstract class Message
      *
      * @param Request $request
      */
-    public function __construct( Request $request )
+    public function __construct(Request $request)
     {
         $this->request = $request;
     }
@@ -26,7 +32,7 @@ abstract class Message
      *
      * @return Request
      */
-    public function request() : Request
+    public function request(): Request
     {
         return $this->request;
     }
@@ -34,9 +40,9 @@ abstract class Message
     /**
      * Get parsed attributes
      *
-     * @return array
+     * @return mixed[]
      */
-    public function attributes() : array
+    public function attributes(): array
     {
         return $this->request->all();
     }
@@ -46,7 +52,7 @@ abstract class Message
      *
      * @return string|null
      */
-    public function id() : ? string
+    public function id(): ?string
     {
         return $this->request()->get('id');
     }
@@ -56,7 +62,7 @@ abstract class Message
      *
      * @return string|null
      */
-    public function password() : ? string
+    public function password(): ?string
     {
         return $this->request()->get('password');
     }
@@ -66,6 +72,5 @@ abstract class Message
      *
      * @return string|null
      */
-    abstract public function ack() : ? string;
-
+    abstract public function ack(): ?string;
 }
