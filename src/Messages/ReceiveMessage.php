@@ -1,16 +1,22 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Pikart\Goip\Messages;
 
 use Pikart\Goip\Message;
 
+/**
+ * @package Pikart\Goip\Messages
+ */
 class ReceiveMessage extends Message
 {
     /**
      * Ack message
      */
-    public function ack(): ? string
+    public function ack(): ?string
     {
-        return "RECEIVE ".$this->request()->get('receive').' OK';
+        return "RECEIVE " . $this->request()->get('receive') . ' OK';
     }
 
     /**
@@ -18,9 +24,9 @@ class ReceiveMessage extends Message
      *
      * @return int|null
      */
-    public function receive() : ? int
+    public function receive(): ?int
     {
-        return $this->request()->get('receive');
+        return $this->request()->getAsInt('receive');
     }
 
     /**
@@ -28,9 +34,9 @@ class ReceiveMessage extends Message
      *
      * @return int|null
      */
-    public function srcnum() : ? int
+    public function srcnum(): ?int
     {
-        return $this->request()->get('srcnum');
+        return $this->request()->getAsInt('srcnum');
     }
 
     /**
@@ -38,7 +44,7 @@ class ReceiveMessage extends Message
      *
      * @return string|null
      */
-    public function msg() : ? string
+    public function msg(): ?string
     {
         return $this->request()->get('msg');
     }

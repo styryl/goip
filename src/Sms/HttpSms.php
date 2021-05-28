@@ -1,10 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Pikart\Goip\Sms;
-use GuzzleHttp\Client;
-use Pikart\Goip\Contracts\Sms;
-use Pikart\Goip\Exceptions\GoipException;
 
+use Pikart\Goip\Exceptions\GoipException;
+use Pikart\Goip\Contracts\Sms;
+use GuzzleHttp\Client;
+
+/**
+ * @package Pikart\Goip\Sms
+ */
 class HttpSms implements Sms
 {
     /**
@@ -52,7 +58,7 @@ class HttpSms implements Sms
     /**
      * Guzzle config
      *
-     * @var array
+     * @var mixed[]
      */
     private array $guzzleConfig = [];
 
@@ -87,12 +93,12 @@ class HttpSms implements Sms
     /**
      * Status for sms that was not sent, but is in sending state
      */
-    const STATUS_SENDING = 'sending';
+    public const STATUS_SENDING = 'sending';
 
     /**
      * Status for sms that was sent
      */
-    const STATUS_SEND = 'send';
+    public const STATUS_SEND = 'send';
 
     /**
      * HttpSms constructor.
@@ -115,21 +121,25 @@ class HttpSms implements Sms
      *
      * @param string $number Phone number
      * @param string $message Text message
-     * @return array
+     * @return mixed[]
      * @throws GoipException
      */
     public function send(string $number, string $message): array
     {
-        $response = $this->parse( $this->makeRequest($this->prepareAddress($this->sendDir), [
-            'u' => $this->login,
-            'p' => $this->password,
-            'l' => $this->line,
-            'n' => $number,
-            'm' => $message
-        ]) );
+        $response = $this->parse(
+            $this->makeRequest(
+                $this->prepareAddress($this->sendDir),
+                [
+                    'u' => $this->login,
+                    'p' => $this->password,
+                    'l' => $this->line,
+                    'n' => $number,
+                    'm' => $message
+                ]
+            )
+        );
 
-        if( $this->waitForSend && !$this->isSend( $response['id'] ) )
-        {
+        if ($this->waitForSend && !$this->isSend($response['id'])) {
             // If sms was not send but is in send queue in qoip
             return $response;
         }
@@ -142,32 +152,33 @@ class HttpSms implements Sms
     /**
      * Check if sms was sent
      *
-     * @param string $id Goip unique session id
+     * @param string $uniqueSessionIdentifier Goip unique session id
      * @return bool
      */
-    public function isSend( string $id ) : bool
+    public function isSend(string $uniqueSessionIdentifier): bool
     {
-        for ( $i = 0; $i <= $this->statusCheckTries; $i++ )
-        {
-            try
-            {
-                $parsed = $this->parseStatusXml( $this->makeRequest($this->prepareAddress($this->statusDir), [
-                    'u' => $this->login,
-                    'p' => $this->password,
-                ]) );
+        for ($i = 0; $i <= $this->statusCheckTries; $i++) {
+            try {
+                $parsed = $this->parseStatusXml(
+                    $this->makeRequest(
+                        $this->prepareAddress($this->statusDir),
+                        [
+                            'u' => $this->login,
+                            'p' => $this->password,
+                        ]
+                    )
+                );
 
-                if(
-                    $parsed['id'] === $id &&
-                    strtolower( $parsed['status']  ) === 'done' &&
-                    empty( $parsed['error'] ) )
-                {
+                if (
+                    $parsed['id'] === $uniqueSessionIdentifier
+                    && strtolower($parsed['status']) === 'done'
+                    && isset($parsed['error'])
+                ) {
                     return true;
                 }
 
                 sleep(1);
-            }
-            catch ( \Exception $exception )
-            {
+            } catch (\Exception $exception) {
                 continue;
             }
         }
@@ -180,7 +191,7 @@ class HttpSms implements Sms
      *
      * @param int $tries
      */
-    public function setStatusCheckTries( int $tries ) : void
+    public function setStatusCheckTries(int $tries): void
     {
         $this->statusCheckTries = $tries;
     }
@@ -190,7 +201,7 @@ class HttpSms implements Sms
      *
      * @param bool $wait
      */
-    public function setWaitForSend( bool $wait ) : void
+    public function setWaitForSend(bool $wait): void
     {
         $this->waitForSend = $wait;
     }
@@ -200,22 +211,21 @@ class HttpSms implements Sms
      *
      * @return Client
      */
-    protected function resolveGuzzleClient() : Client
+    protected function resolveGuzzleClient(): Client
     {
-        if( isset( $this->guzzleClient ) )
-        {
+        if (isset($this->guzzleClient)) {
             return $this->guzzleClient;
         };
 
-        return $this->guzzleClient = new Client( $this->guzzleConfig );
+        return $this->guzzleClient = new Client($this->guzzleConfig);
     }
 
     /**
      * Set guzzle client config
      *
-     * @param array $config
+     * @param mixed[] $config
      */
-    public function setGuzzleConfig( array $config ) : void
+    public function setGuzzleConfig(array $config): void
     {
         $this->guzzleConfig = $config;
     }
@@ -225,7 +235,7 @@ class HttpSms implements Sms
      *
      * @param int $timeout
      */
-    public function setGuzzleTimeout( int $timeout ) : void
+    public function setGuzzleTimeout(int $timeout): void
     {
         $this->guzzleTimeout = $timeout;
     }
@@ -234,33 +244,31 @@ class HttpSms implements Sms
      * Parse response from goip
      *
      * @param string $response
-     * @return array
+     * @return mixed[]
      * @throws GoipException
      */
-    protected function parse( string $response ) : array
+    protected function parse(string $response): array
     {
-        $response = trim( $response );
-        if(
-            strpos( strtolower( $response ), 'error' ) !== false ||
-            strpos( strtolower( $response ), 'sending' ) === false
-        )
-        {
+        $response = trim($response);
+        if (
+            strpos(strtolower($response), 'error') !== false ||
+            strpos(strtolower($response), 'sending') === false
+        ) {
             throw new GoipException($response);
         }
 
-        $responseArr = explode(' ', $response );
-        $id = end($responseArr);
+        $responseArr = explode(' ', $response);
+        $identifier = end($responseArr);
 
-        if( strpos( strtolower($id), 'id' ) === false )
-        {
+        if (strpos(strtolower($identifier), 'id') === false) {
             throw new GoipException('Sms id not found in response');
         }
 
-        $id = explode( ':', $id )[1];
+        $identifier = explode(':', $identifier)[1];
 
         return [
-            'id'     => $id,
-            'raw'    => $response,
+            'id' => $identifier,
+            'raw' => $response,
             'status' => HttpSms::STATUS_SENDING
         ];
     }
@@ -269,20 +277,20 @@ class HttpSms implements Sms
      * Parse Goip status list
      *
      * @param string $response
-     * @return array
+     * @return mixed[]
      */
-    protected function parseStatusXml( string $response ) : array
+    protected function parseStatusXml(string $response): array
     {
-        $xml = new \SimpleXMLElement( $response );
+        $xml = new \SimpleXMLElement($response);
 
-        $idNode = 'id'.$this->line;
-        $statusNode = 'status'.$this->line;
-        $errorNode = 'error'.$this->line;
+        $idNode = 'id' . $this->line;
+        $statusNode = 'status' . $this->line;
+        $errorNode = 'error' . $this->line;
 
         return [
-            'id'     => (string) $xml->children()->{ $idNode },
-            'status' => (string) $xml->children()->{ $statusNode },
-            'error'  => (string) $xml->children()->{ $errorNode },
+            'id' => (string)$xml->children()->{$idNode},
+            'status' => (string)$xml->children()->{$statusNode},
+            'error' => (string)$xml->children()->{$errorNode},
         ];
     }
 
@@ -292,12 +300,11 @@ class HttpSms implements Sms
      * @param string $dir
      * @return string
      */
-    protected function prepareAddress( string $dir ) : string
+    protected function prepareAddress(string $dir): string
     {
         $host = $this->host;
 
-        if(substr($this->host, -1) == '/')
-        {
+        if (substr($this->host, -1) == '/') {
             $host = substr($this->host, 0, -1);
         }
 
@@ -308,21 +315,30 @@ class HttpSms implements Sms
      * Make request to Goip by guzzle client
      *
      * @param string $address
-     * @param array $query
+     * @param mixed[] $query
      * @return string
      * @throws GoipException
      */
-    protected function makeRequest( string $address, array $query) : string
+    protected function makeRequest(string $address, array $query): string
     {
-        $response = $this->resolveGuzzleClient()->request( 'GET', $address, [
-            'timeout' => $this->guzzleTimeout,
-            'allow_redirects' => false,
-            'query' => $query
-        ]);
+        $response = $this->resolveGuzzleClient()->request(
+            'GET',
+            $address,
+            [
+                'timeout' => $this->guzzleTimeout,
+                'allow_redirects' => false,
+                'query' => $query
+            ]
+        );
 
-        if( $response->getStatusCode() !== 200 )
-        {
-            throw new GoipException('Goip does not respond correctly on address: '.$address.', please check the host, status: '.$response->getStatusCode());
+        if ($response->getStatusCode() !== 200) {
+            $exceptionMessage = sprintf(
+                'Goip does not respond correctly on address: %s, please check the host, status: %u',
+                $address,
+                $response->getStatusCode()
+            );
+
+            throw new GoipException($exceptionMessage);
         }
 
         return $response->getBody()->getContents();

@@ -1,8 +1,8 @@
 <?php
 
-namespace Pikart\Goip;
+declare(strict_types=1);
 
-use Pikart\Goip\Events\RequestEvent;
+namespace Pikart\Goip;
 
 class UdpServer extends Server
 {
@@ -24,7 +24,7 @@ class UdpServer extends Server
      *
      * @param int $loopSleep
      */
-    public function setLoopSleep( int $loopSleep ) : void
+    public function setLoopSleep(int $loopSleep): void
     {
         $this->loopSleep = $loopSleep;
     }
@@ -34,25 +34,17 @@ class UdpServer extends Server
      *
      * @throws Exceptions\SocketException
      */
-    public function run() : void
+    public function run(): void
     {
         $this->createSocket();
-
-        while ( !$this->stop )
-        {
+        while (!$this->stop) {
             $request = $this->receive();
-
-            if( is_null( $request )  )
-            {
-                if( !$this->stop )
-                {
-                    usleep($this->loopSleep);
-                }
-
+            if (is_null($request)) {
+                usleep($this->loopSleep);
                 continue;
             }
 
-            $this->dispatch( $request );
+            $this->dispatch($request);
         }
     }
 
@@ -62,29 +54,26 @@ class UdpServer extends Server
      * @return Request|null
      * @throws Exceptions\SocketException
      */
-    private function receive() : ? Request
+    private function receive(): ?Request
     {
-         $rcvfrom = socket_recvfrom($this->socket, $buffer, 2048, 0, $host, $port);
+        $rcvfrom = socket_recvfrom($this->socket, $buffer, 2048, 0, $host, $port);
 
-         // If there was an error
-        if( $rcvfrom === false )
-        {
+        // If there was an error
+        if ($rcvfrom === false) {
             $errorCode = socket_last_error($this->socket);
 
-            if( $errorCode === 11 )
-            {
-                return  null;
+            if ($errorCode === 11) {
+                return null;
             }
 
-            throw new Exceptions\SocketException( $this->socketLastError() );
+            throw new Exceptions\SocketException($this->socketLastError());
         }
 
-        if( $rcvfrom === 0 )
-        {
+        if ($rcvfrom === 0) {
             return null;
         }
 
-        return new Request($buffer,$host,$port);
+        return new Request($buffer, $host, $port);
     }
 
     /**
@@ -95,11 +84,11 @@ class UdpServer extends Server
      * @param int $port
      * @throws Exceptions\SocketException
      */
-    protected function send( string $message, string $host, int $port ) : void
+    protected function send(string $message, string $host, int $port): void
     {
-        if( !$return = socket_sendto($this->socket, $message, strlen($message), 0, $host, $port ) )
-        {
-            throw new Exceptions\SocketException( $this->socketLastError() );
+        $socketSendTo = socket_sendto($this->socket, $message, strlen($message), 0, $host, $port);
+        if ($socketSendTo === false) {
+            throw new Exceptions\SocketException($this->socketLastError());
         }
     }
 
@@ -108,16 +97,17 @@ class UdpServer extends Server
      *
      * @throws Exceptions\SocketException
      */
-    private function createSocket() : void
+    private function createSocket(): void
     {
-        if(!$this->socket = socket_create( AF_INET, SOCK_DGRAM, SOL_UDP ) )
-        {
-            throw new Exceptions\SocketException( $this->socketLastError() );
+        $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
+        if ($socket === false) {
+            throw new Exceptions\SocketException($this->socketLastError());
         }
 
-        if( !socket_bind( $this->socket, $this->host, $this->port ) )
-        {
-            throw new Exceptions\SocketException( $this->socketLastError() );
+        $this->socket = $socket;
+
+        if (!socket_bind($this->socket, $this->host, $this->port)) {
+            throw new Exceptions\SocketException($this->socketLastError());
         }
 
         socket_set_nonblock($this->socket);
@@ -126,7 +116,7 @@ class UdpServer extends Server
     /**
      * Close socket connection
      */
-    private function closeSocket() : void
+    private function closeSocket(): void
     {
         socket_close($this->socket);
     }
@@ -145,8 +135,8 @@ class UdpServer extends Server
      *
      * @return string
      */
-    private function socketLastError() : string
+    private function socketLastError(): string
     {
-        return socket_strerror( socket_last_error( $this->socket ) );
+        return socket_strerror(socket_last_error($this->socket));
     }
 }

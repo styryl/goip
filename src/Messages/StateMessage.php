@@ -1,13 +1,19 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Pikart\Goip\Messages;
 
 use Pikart\Goip\Message;
 
+/**
+ * @package Pikart\Goip\Messages
+ */
 class StateMessage extends Message
 {
-    public function ack(): ? string
+    public function ack(): ?string
     {
-        return "STATE ".$this->request()->get('state').' OK';
+        return "STATE " . $this->request()->get('state') . ' OK';
     }
 
     /**
@@ -15,9 +21,9 @@ class StateMessage extends Message
      *
      * @return int|null
      */
-    public function state() : ? int
+    public function state(): ?int
     {
-        return $this->request()->get('state');
+        return $this->request()->getAsInt('state');
     }
 
     /**
@@ -25,9 +31,8 @@ class StateMessage extends Message
      *
      * @return string|null
      */
-    public function gsmRemainState() : ? string
+    public function gsmRemainState(): ?string
     {
         return $this->request()->get('gsm_remain_state');
     }
-
 }

@@ -1,11 +1,17 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Pikart\Goip\Sms;
 
-use Pikart\Goip\Contracts\Sms;
-use Pikart\Goip\Exceptions\GoipException;
-use Pikart\Goip\Exceptions\SocketException;
 use Pikart\Goip\Exceptions\TimeoutException;
+use Pikart\Goip\Exceptions\SocketException;
+use Pikart\Goip\Exceptions\GoipException;
+use Pikart\Goip\Contracts\Sms;
 
+/**
+ * @package Pikart\Goip\Sms
+ */
 class SocketSms implements Sms
 {
     /**
@@ -27,7 +33,7 @@ class SocketSms implements Sms
      *
      * @var string
      */
-    private string $id;
+    private string $uniqueSessionIdentifier;
 
     /**
      * Goip password
@@ -39,7 +45,7 @@ class SocketSms implements Sms
     /**
      * Connection options
      *
-     * @var array
+     * @var mixed[]
      */
     private array $options = [
         'timeout' => 5
@@ -57,20 +63,25 @@ class SocketSms implements Sms
      *
      * @param string $host Goip host
      * @param int $port Goip port
-     * @param string $id Unique sending session id
+     * @param string $uniqueSessionIdentifier Unique sending session id
      * @param string $password Goip password
-     * @param array|null $options
+     * @param mixed[]|null $options
+     * @throws SocketException
      */
-    public function __construct( string $host, int $port, string $id, string $password, ?array $options = null)
-    {
+    public function __construct(
+        string $host,
+        int $port,
+        string $uniqueSessionIdentifier,
+        string $password,
+        ?array $options = null
+    ) {
         $this->host = $host;
         $this->port = $port;
-        $this->id = $id;
+        $this->uniqueSessionIdentifier = $uniqueSessionIdentifier;
         $this->password = $password;
 
-        if( $options )
-        {
-            array_merge( $this->options, $options );
+        if (!is_null($options)) {
+            $this->options = array_merge($this->options, $options);
         }
 
         $this->createSocket();
@@ -82,7 +93,7 @@ class SocketSms implements Sms
      *
      * @param string $number Phone number
      * @param string $message Text message
-     * @return array Response from goip
+     * @return mixed[] Response from goip
      * @throws GoipException
      * @throws SocketException
      * @throws TimeoutException
@@ -98,13 +109,13 @@ class SocketSms implements Sms
         $this->sendEndRequest();
         $this->waitForResponse('sendEndRequest', 'DONE');
 
-        $arr = explode( ' ', str_replace(array("\r", "\n"), '', $response ) );
+        $arr = explode(' ', str_replace(array("\r", "\n"), '', $response));
 
         return [
             'sendid' => $arr[1], // bulk SMS session identifier
-            'telid'  => $arr[2], // Integer, unique sequence number in SubmitNumberRequest.
+            'telid' => $arr[2], // Integer, unique sequence number in SubmitNumberRequest.
             'sms_no' => $arr[3], // number count of SMS sending in GoIP
-            'raw'    => $response
+            'raw' => $response
         ];
     }
 
@@ -113,20 +124,20 @@ class SocketSms implements Sms
      *
      * @param string $message
      */
-    protected function sendBulkSmsRequest( string $message ) : void
+    protected function sendBulkSmsRequest(string $message): void
     {
         //GOIP message max length is 3000 bytes
-        $cutmessage = mb_strcut( $message, 0, 3000);
-        $message = "MSG " . $this->id . " " . strlen($cutmessage) . " " . $cutmessage. "\n";
+        $cutmessage = mb_strcut($message, 0, 3000);
+        $message = "MSG " . $this->uniqueSessionIdentifier . " " . strlen($cutmessage) . " " . $cutmessage . "\n";
         $this->sendRequest($message);
     }
 
     /**
      * Second step of sms sending
      */
-    protected function sendAuthRequest()  : void
+    protected function sendAuthRequest(): void
     {
-        $message = "PASSWORD " . $this->id . " " . $this->password;
+        $message = "PASSWORD " . $this->uniqueSessionIdentifier . " " . $this->password;
         $this->sendRequest($message);
     }
 
@@ -135,51 +146,53 @@ class SocketSms implements Sms
      *
      * @param string $number
      */
-    protected function sendNumberRequest( string $number ) : void
+    protected function sendNumberRequest(string $number): void
     {
-        $message = "SEND " . $this->id . " 1 " . $number;
+        $message = "SEND " . $this->uniqueSessionIdentifier . " 1 " . $number;
         $this->sendRequest($message);
     }
 
     /**
      * Last step of sms sending
      */
-    protected function sendEndRequest() : void
+    protected function sendEndRequest(): void
     {
-        $message = "DONE " . $this->id;
+        $message = "DONE " . $this->uniqueSessionIdentifier;
         $this->sendRequest($message);
     }
 
     /**
      * Create php socket
+     * @throws SocketException
      */
-    private function createSocket() : void
+    private function createSocket(): void
     {
-        if(!$this->socket = socket_create( AF_INET, SOCK_DGRAM, SOL_UDP ) )
-        {
-            throw new Exceptions\SocketException( $this->socketLastError() );
+        $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
+        if ($socket === false) {
+            throw new SocketException($this->socketLastError());
         }
+
+        $this->socket = $socket;
     }
 
     /**
      * Set socket options
+     * @throws SocketException
      */
-    private function setSocketOptions() : void
+    private function setSocketOptions(): void
     {
-        if( !socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, [
-            'sec' => $this->options['timeout'],
-            'usec' => 0
-        ]) )
-        {
-            throw new Exceptions\SocketException( $this->socketLastError() );
-        }
+        $socketSetOptions = socket_set_option(
+            $this->socket,
+            SOL_SOCKET,
+            SO_RCVTIMEO,
+            [
+                'sec' => $this->options['timeout'],
+                'usec' => 0
+            ]
+        );
 
-        if( !socket_set_option($this->socket, SOL_SOCKET, SO_SNDTIMEO, [
-            'sec' => $this->options['timeout'],
-            'usec' => 0
-        ]) )
-        {
-            throw new Exceptions\SocketException( $this->socketLastError() );
+        if (!$socketSetOptions) {
+            throw new SocketException($this->socketLastError());
         }
     }
 
@@ -188,15 +201,15 @@ class SocketSms implements Sms
      *
      * @return string
      */
-    private function socketLastError() : string
+    private function socketLastError(): string
     {
-        return socket_strerror( socket_last_error( $this->socket ) );
+        return socket_strerror(socket_last_error($this->socket));
     }
 
     /**
      * Close socket connection
      */
-    private function close() : void
+    private function close(): void
     {
         socket_close($this->socket);
     }
@@ -205,12 +218,13 @@ class SocketSms implements Sms
      * Send request to goip
      *
      * @param string $message
+     * @throws SocketException
      */
-    private function sendRequest( string $message ) : void
+    private function sendRequest(string $message): void
     {
-        if( !socket_sendto($this->socket, $message, strlen($message), 0, $this->host, $this->port ) )
-        {
-            throw new Exceptions\SocketException( $this->socketLastError() );
+        $socketSendTo = socket_sendto($this->socket, $message, strlen($message), 0, $this->host, $this->port);
+        if ($socketSendTo === false) {
+            throw new SocketException($this->socketLastError());
         }
     }
 
@@ -224,25 +238,45 @@ class SocketSms implements Sms
      * @throws SocketException
      * @throws TimeoutException
      */
-    protected function waitForResponse( string $request, string $response ) : string
+    protected function waitForResponse(string $request, string $response): string
     {
-        for($i = 1; $i <= 30; $i++)
-        {
-            if( !socket_recvfrom( $this->socket, $buffer, 2048, 0, $fromip, $fromport ) )
-            {
-                throw new SocketException( $this->socketLastError() );
+        for ($i = 1; $i <= 30; $i++) {
+            $socketRecvFrom = socket_recvfrom($this->socket, $buffer, 2048, 0, $fromip, $fromport);
+            if ($socketRecvFrom === false) {
+                throw new SocketException($this->socketLastError());
             }
 
-            if( substr( $buffer, 0, ( 6 + strlen( $this->id ) ) ) === "ERROR " . $this->id )
-            {
-                throw new GoipException( 'Error in ' . $request . ' request: ' . $buffer );
-            }
-            elseif( substr( $buffer, 0, ( 1 + strlen( $response ) + strlen( $this->id ) ) ) === $response . " " . $this->id )
-            {
+            if ($this->isErrorResponse($buffer)) {
+                throw new GoipException('Error in ' . $request . ' request: ' . $buffer);
+            } elseif ($this->isSuccessResponse($buffer, $response)) {
                 return $buffer;
             }
         }
 
         throw new TimeoutException('Timeout on request: ' . $request);
+    }
+
+    /**
+     * @param string $buffer
+     * @return bool
+     */
+    private function isErrorResponse(string $buffer): bool
+    {
+        $expectedErrorMessage = sprintf('ERROR %s', $this->uniqueSessionIdentifier);
+        return substr($buffer, 0, (6 + strlen($this->uniqueSessionIdentifier))) === $expectedErrorMessage;
+    }
+
+    /**
+     * @param string $buffer
+     * @param string $response
+     * @return bool
+     */
+    private function isSuccessResponse(string $buffer, string $response): bool
+    {
+        $expectedSuccessMessage = sprintf('%s %s', $response, $this->uniqueSessionIdentifier);
+        $responseLength = strlen($response);
+        $uniqueSessionIdentifierLength = strlen($this->uniqueSessionIdentifier);
+        $length = 1 + $responseLength + $uniqueSessionIdentifierLength;
+        return substr($buffer, 0, $length) === $expectedSuccessMessage;
     }
 }
