@@ -10,8 +10,6 @@ class NotSupportedMessage extends Message
 {
     /**
      * Ack message
-     *
-     * @return string|null
      */
     public function ack(): ?string
     {

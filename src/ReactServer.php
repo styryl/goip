@@ -5,19 +5,15 @@ declare(strict_types=1);
 namespace Pikart\Goip;
 
 use React\Datagram\Factory as DatagramFactory;
+use React\Datagram\Socket;
 use React\EventLoop\Factory as LoopFactory;
 use React\EventLoop\LoopInterface;
-use React\Datagram\Socket;
+use React\Promise\PromiseInterface;
 
-/**
- * @package Pikart\Goip
- */
 class ReactServer extends Server
 {
     /**
      * The Socket instance
-     *
-     * @var Socket
      */
     private Socket $socket;
 
@@ -32,19 +28,20 @@ class ReactServer extends Server
 
     /**
      * Create socket server
-     *
-     * @return LoopInterface
      */
     private function createSocket(): LoopInterface
     {
         $loop = LoopFactory::create();
         $factory = new DatagramFactory($loop);
 
-        $factory->createServer($this->host . ':' . $this->port)->then(function (Socket $socket): void {
+        /** @var PromiseInterface<Socket> $server */
+        $server = $factory->createServer($this->host . ':' . $this->port);
+
+        $server->then(function (Socket $socket): void {
             $this->socket = $socket;
         });
 
-        $this->socket->on('message', function ($message, $address): void {
+        $this->socket->on('message', function (string $message, string $address): void {
             $this->onMessage($message, $address);
         });
 
@@ -53,16 +50,13 @@ class ReactServer extends Server
 
     /**
      * Fire when message arrives
-     *
-     * @param string $message
-     * @param string $address
      */
     private function onMessage(string $message, string $address): void
     {
         $addressArr = explode(':', $address);
 
         // Create request
-        $request = new Request($message, $addressArr[0], (int)$addressArr[1]);
+        $request = new Request($message, $addressArr[0], (int) $addressArr[1]);
 
         // Dispatch message from request
         $this->dispatch($request);
@@ -70,10 +64,6 @@ class ReactServer extends Server
 
     /**
      * Send message to client
-     *
-     * @param string $message
-     * @param string $host
-     * @param int $port
      */
     protected function send(string $message, string $host, int $port): void
     {

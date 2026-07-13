@@ -4,54 +4,39 @@ declare(strict_types=1);
 
 namespace Pikart\Goip\Sms;
 
-use Pikart\Goip\Exceptions\GoipException;
-use Pikart\Goip\Contracts\Sms;
 use GuzzleHttp\Client;
+use Pikart\Goip\Contracts\Sms;
+use Pikart\Goip\Exceptions\GoipException;
 
-/**
- * @package Pikart\Goip\Sms
- */
 class HttpSms implements Sms
 {
     /**
      * Goip host
-     *
-     * @var string
      */
     private string $host;
 
     /**
      * Goip line number
-     *
-     * @var int
      */
     private int $line;
 
     /**
      * Goip login
-     *
-     * @var string
      */
     private string $login;
 
     /**
      * Goip password
-     *
-     * @var string
      */
     private string $password;
 
     /**
      * Guzzle Client
-     *
-     * @var Client
      */
     private Client $guzzleClient;
 
     /**
      * Guzzle timeout
-     *
-     * @var int
      */
     private int $guzzleTimeout = 3;
 
@@ -64,29 +49,21 @@ class HttpSms implements Sms
 
     /**
      * Wait for status check flag
-     *
-     * @var bool
      */
     private bool $waitForSend = true;
 
     /**
      * Number of status check tires
-     *
-     * @var int
      */
     private int $statusCheckTries = 10;
 
     /**
      * Url for sms send
-     *
-     * @var string
      */
     private string $sendDir = '/default/en_US/send.html';
 
     /**
      * Url for status check
-     *
-     * @var string
      */
     private string $statusDir = '/default/en_US/send_status.xml';
 
@@ -101,8 +78,6 @@ class HttpSms implements Sms
     public const STATUS_SEND = 'send';
 
     /**
-     * HttpSms constructor.
-     *
      * @param string $host Goip host for example: http://192.168.0.11
      * @param int $line Goip line number,
      * @param string $login Goip login
@@ -121,7 +96,7 @@ class HttpSms implements Sms
      *
      * @param string $number Phone number
      * @param string $message Text message
-     * @return mixed[]
+     * @return array<string, string>
      * @throws GoipException
      */
     public function send(string $number, string $message): array
@@ -134,12 +109,12 @@ class HttpSms implements Sms
                     'p' => $this->password,
                     'l' => $this->line,
                     'n' => $number,
-                    'm' => $message
+                    'm' => $message,
                 ]
             )
         );
 
-        if ($this->waitForSend && !$this->isSend($response['id'])) {
+        if ($this->waitForSend && ! $this->isSend($response['id'])) {
             // If sms was not send but is in send queue in qoip
             return $response;
         }
@@ -153,7 +128,6 @@ class HttpSms implements Sms
      * Check if sms was sent
      *
      * @param string $uniqueSessionIdentifier Goip unique session id
-     * @return bool
      */
     public function isSend(string $uniqueSessionIdentifier): bool
     {
@@ -188,8 +162,6 @@ class HttpSms implements Sms
 
     /**
      * Set loop tries for status checking
-     *
-     * @param int $tries
      */
     public function setStatusCheckTries(int $tries): void
     {
@@ -198,24 +170,17 @@ class HttpSms implements Sms
 
     /**
      * Set if send command must wait for status check
-     *
-     * @param bool $wait
      */
     public function setWaitForSend(bool $wait): void
     {
         $this->waitForSend = $wait;
     }
 
-    /**
-     * Resolve Guzzle Client
-     *
-     * @return Client
-     */
     protected function resolveGuzzleClient(): Client
     {
         if (isset($this->guzzleClient)) {
             return $this->guzzleClient;
-        };
+        }
 
         return $this->guzzleClient = new Client($this->guzzleConfig);
     }
@@ -232,8 +197,6 @@ class HttpSms implements Sms
 
     /**
      * Set guzzle request timeout
-     *
-     * @param int $timeout
      */
     public function setGuzzleTimeout(int $timeout): void
     {
@@ -243,8 +206,7 @@ class HttpSms implements Sms
     /**
      * Parse response from goip
      *
-     * @param string $response
-     * @return mixed[]
+     * @return array<string, string>
      * @throws GoipException
      */
     protected function parse(string $response): array
@@ -269,15 +231,14 @@ class HttpSms implements Sms
         return [
             'id' => $identifier,
             'raw' => $response,
-            'status' => HttpSms::STATUS_SENDING
+            'status' => HttpSms::STATUS_SENDING,
         ];
     }
 
     /**
      * Parse Goip status list
      *
-     * @param string $response
-     * @return mixed[]
+     * @return array<string, string>
      */
     protected function parseStatusXml(string $response): array
     {
@@ -288,23 +249,29 @@ class HttpSms implements Sms
         $errorNode = 'error' . $this->line;
 
         return [
-            'id' => (string)$xml->children()->{$idNode},
-            'status' => (string)$xml->children()->{$statusNode},
-            'error' => (string)$xml->children()->{$errorNode},
+            'id' => $this->xmlChildValue($xml, $idNode),
+            'status' => $this->xmlChildValue($xml, $statusNode),
+            'error' => $this->xmlChildValue($xml, $errorNode),
         ];
+    }
+
+    private function xmlChildValue(\SimpleXMLElement $xml, string $node): string
+    {
+        /** @var \SimpleXMLElement $value */
+        $value = $xml->children()
+            ->{$node};
+
+        return (string) $value;
     }
 
     /**
      * Prepare goip command HTTP address
-     *
-     * @param string $dir
-     * @return string
      */
     protected function prepareAddress(string $dir): string
     {
         $host = $this->host;
 
-        if (substr($this->host, -1) == '/') {
+        if (substr($this->host, -1) === '/') {
             $host = substr($this->host, 0, -1);
         }
 
@@ -314,22 +281,21 @@ class HttpSms implements Sms
     /**
      * Make request to Goip by guzzle client
      *
-     * @param string $address
      * @param mixed[] $query
-     * @return string
      * @throws GoipException
      */
     protected function makeRequest(string $address, array $query): string
     {
-        $response = $this->resolveGuzzleClient()->request(
-            'GET',
-            $address,
-            [
-                'timeout' => $this->guzzleTimeout,
-                'allow_redirects' => false,
-                'query' => $query
-            ]
-        );
+        $response = $this->resolveGuzzleClient()
+            ->request(
+                'GET',
+                $address,
+                [
+                    'timeout' => $this->guzzleTimeout,
+                    'allow_redirects' => false,
+                    'query' => $query,
+                ]
+            );
 
         if ($response->getStatusCode() !== 200) {
             $exceptionMessage = sprintf(
@@ -341,6 +307,7 @@ class HttpSms implements Sms
             throw new GoipException($exceptionMessage);
         }
 
-        return $response->getBody()->getContents();
+        return $response->getBody()
+            ->getContents();
     }
 }

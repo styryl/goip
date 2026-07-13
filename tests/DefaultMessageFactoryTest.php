@@ -22,43 +22,43 @@ class DefaultMessageFactoryTest extends TestCase
         $this->factory = new DefaultMessageFactory();
     }
 
-    public function testItCanMakeRequestMessage() : void
+    public function testItCanMakeRequestMessage(): void
     {
-        $this->assertInstanceOf( RequestMessage::class, $this->makeMessage('req') );
+        $this->assertInstanceOf(RequestMessage::class, $this->makeMessage('req'));
     }
 
-    public function testItCanMakeStateMessage() : void
+    public function testItCanMakeStateMessage(): void
     {
-        $this->assertInstanceOf( StateMessage::class, $this->makeMessage('state') );
+        $this->assertInstanceOf(StateMessage::class, $this->makeMessage('state'));
     }
 
-    public function testItCanMakeRecordMessage() : void
+    public function testItCanMakeRecordMessage(): void
     {
-        $this->assertInstanceOf( RecordMessage::class, $this->makeMessage('record') );
+        $this->assertInstanceOf(RecordMessage::class, $this->makeMessage('record'));
     }
 
-    public function testItCanMakeHangupMessage() : void
+    public function testItCanMakeHangupMessage(): void
     {
-        $this->assertInstanceOf( HangupMessage::class, $this->makeMessage('hangup') );
+        $this->assertInstanceOf(HangupMessage::class, $this->makeMessage('hangup'));
     }
 
-    public function testItCanMakeReceiveMessage() : void
+    public function testItCanMakeReceiveMessage(): void
     {
-        $this->assertInstanceOf( ReceiveMessage::class, $this->makeMessage('receive') );
+        $this->assertInstanceOf(ReceiveMessage::class, $this->makeMessage('receive'));
     }
 
-    public function testItCanMakeDeliverMessage() : void
+    public function testItCanMakeDeliverMessage(): void
     {
-        $this->assertInstanceOf( DeliverMessage::class, $this->makeMessage('deliver') );
+        $this->assertInstanceOf(DeliverMessage::class, $this->makeMessage('deliver'));
     }
 
-    public function testItMakeNotSupportedMessageIfRequestTypeIsNotSupported() : void
+    public function testItMakeNotSupportedMessageIfRequestTypeIsNotSupported(): void
     {
-        $this->assertInstanceOf( NotSupportedMessage::class, $this->makeMessage('other') );
+        $this->assertInstanceOf(NotSupportedMessage::class, $this->makeMessage('other'));
     }
 
-    private function makeMessage( string $type ) : Message
+    private function makeMessage(string $type): Message
     {
-        return $this->factory->make( new Request( $this->sampleBuffers( $type ), '0.0.0.0', 0 ) );
+        return $this->factory->make(new Request($this->sampleBuffers($type), '0.0.0.0', 0));
     }
 }

@@ -9,51 +9,49 @@ use Pikart\Goip\Tests\TestCase;
 class RecordMessageTest extends TestCase
 {
     private RecordMessage $message;
+
     private Request $request;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->request = new Request( $this->sampleBuffers('record'), '0.0.0.0', 0 );
-        $this->message = new RecordMessage( $this->request );
+        $this->request = new Request($this->sampleBuffers('record'), '0.0.0.0', 0);
+        $this->message = new RecordMessage($this->request);
     }
 
-    public function testItCanReturnAck() : void
+    public function testItCanReturnAck(): void
     {
-        $this->assertEquals( "RECORD ".$this->request->get('record').' OK', $this->message->ack() );
-        $this->assertIsInt( $this->message->record() );
+        $this->assertEquals('RECORD ' . $this->request->get('record') . ' OK', $this->message->ack());
+        $this->assertIsInt($this->message->record());
     }
 
-    public function testItCanReturnRecord() : void
+    public function testItCanReturnRecord(): void
     {
-        $this->assertEquals( $this->request->get('record'), $this->message->record() );
-        $this->assertIsInt( $this->message->record() );
+        $this->assertEquals($this->request->get('record'), $this->message->record());
+        $this->assertIsInt($this->message->record());
     }
 
-    public function testItCanReturnId() : void
+    public function testItCanReturnId(): void
     {
-        $this->assertEquals( $this->request->get('id'), $this->message->id() );
-        $this->assertIsString( $this->message->id() );
+        $this->assertEquals($this->request->get('id'), $this->message->id());
+        $this->assertIsString($this->message->id());
     }
 
-    public function testItCanReturnPassword() : void
+    public function testItCanReturnPassword(): void
     {
-        $this->assertEquals( $this->request->get('password'), $this->message->password() );
-        $this->assertIsString( $this->message->password() );
+        $this->assertEquals($this->request->get('password'), $this->message->password());
+        $this->assertIsString($this->message->password());
     }
 
-    public function testItCanReturnDir() : void
+    public function testItCanReturnDir(): void
     {
-        $this->assertEquals( $this->request->get('dir'), $this->message->dir() );
-        $this->assertIsInt( $this->message->dir() );
+        $this->assertEquals($this->request->get('dir'), $this->message->dir());
+        $this->assertIsInt($this->message->dir());
     }
 
-    public function testItCanReturnNum() : void
+    public function testItCanReturnNum(): void
     {
-        $this->assertEquals( $this->request->get('num'), $this->message->num() );
-        $this->assertIsString( $this->message->num() );
+        $this->assertEquals($this->request->get('num'), $this->message->num());
+        $this->assertIsString($this->message->num());
     }
-
 }
-
-

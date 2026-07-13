@@ -4,38 +4,25 @@ declare(strict_types=1);
 
 namespace Pikart\Goip;
 
-use Pikart\Goip\Contracts\ServerFactory as ServerFactoryContract;
+use LogicException;
 use Pikart\Goip\Contracts\MessageDispatcher;
 use Pikart\Goip\Contracts\MessageFactory;
-use ReflectionException;
+use Pikart\Goip\Contracts\ServerFactory as ServerFactoryContract;
 use ReflectionClass;
-use LogicException;
+use ReflectionException;
 
-/**
- * @package Pikart\Goip
- */
 class ServerFactory implements ServerFactoryContract
 {
     /**
      * Message factory implementation
-     *
-     * @var MessageFactory
      */
     private MessageFactory $messageFactory;
 
     /**
      * Message dispatcher implementation
-     *
-     * @var MessageDispatcher
      */
     private MessageDispatcher $messageDispatcher;
 
-    /**
-     * ServerFactory constructor.
-     *
-     * @param MessageFactory $messageFactory
-     * @param MessageDispatcher $messageDispatcher
-     */
     public function __construct(MessageFactory $messageFactory, MessageDispatcher $messageDispatcher)
     {
         $this->messageDispatcher = $messageDispatcher;
@@ -49,7 +36,6 @@ class ServerFactory implements ServerFactoryContract
      * @param string $host Host to bind
      * @param int $port Port to bind
      * @param mixed[] $args Additional parameters
-     * @return Server
      * @throws ReflectionException
      */
     public function make(string $serverClass, string $host, int $port, array $args = []): Server
@@ -67,16 +53,15 @@ class ServerFactory implements ServerFactoryContract
      *
      * @param class-string $serverClass
      * @param mixed[] $args
-     * @return Server
      * @throws ReflectionException
      */
     private function resolve(string $serverClass, array $args = []): Server
     {
         $reflection = new ReflectionClass($serverClass);
-        $server = !is_null($reflection->getConstructor())
+        $server = $reflection->getConstructor() !== null
             ? $reflection->newInstanceArgs($args)
             : $reflection->newInstance();
-        if (!$server instanceof Server) {
+        if (! $server instanceof Server) {
             throw new LogicException('Cannot create server implementation.');
         }
 
@@ -87,10 +72,7 @@ class ServerFactory implements ServerFactoryContract
      * Resolve default Server instance
      *
      * @param class-string $serverClass
-     * @param string $host
-     * @param int $port
      * @param mixed[] $args
-     * @return Server
      *
      * @throws ReflectionException
      */

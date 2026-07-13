@@ -1,4 +1,5 @@
 .idea
 vendor
+.phpunit.result.cache
 dev.md
 app.php

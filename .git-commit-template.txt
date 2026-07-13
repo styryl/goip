@@ -1,0 +1,29 @@
+# -------------------------------------------------------------
+# Instructions:
+# To set this file as the default commit message template:
+#
+# git config commit.template .git-commit-template.txt
+#
+# -------------------------------------------------------------
+# Commit types:
+# feat     - a new feature
+# fix      - a bug fix
+# docs     - documentation changes
+# style    - code style changes without affecting logic
+# refactor - code refactoring without changing behavior
+# test     - adding or modifying tests
+# chore    - maintenance tasks, tools, dependencies, or scripts
+# -------------------------------------------------------------
+# Rules:
+# - Use a short description, preferably no longer than 50 characters
+# - Write commit messages in English
+# - Use the imperative mood, for example: "add", "fix", or "update"
+# - Do not end the short description with a period
+# - Keep the message clear and consistent with the implemented changes
+# - An optional scope may be provided in parentheses, for example: feat(auth):
+# - An optional detailed description may be added below, separated by a blank line
+# - Keep each line of the detailed description within 72 characters
+# -------------------------------------------------------------
+<type>: <short description>
+
+(optional detailed description)

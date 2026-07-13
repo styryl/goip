@@ -1,6 +1,7 @@
 <?php
 
 namespace Pikart\Goip\Tests\Sms;
+
 use Pikart\Goip\Exceptions\GoipException;
 use Pikart\Goip\Exceptions\SocketException;
 use Pikart\Goip\Sms\SocketSms;
@@ -13,7 +14,7 @@ class SocketSmsTest extends TestCase
 
     public function setUp(): void
     {
-       $this->goipServer = new GoipServer('127.0.0.1', 333);
+        $this->goipServer = new GoipServer('127.0.0.1', 333);
     }
 
     public function tearDown(): void
@@ -21,12 +22,12 @@ class SocketSmsTest extends TestCase
         $this->goipServer->close();
     }
 
-    public function testItCanSendBulkSmsRequest() : void
+    public function testItCanSendBulkSmsRequest(): void
     {
         $sms = new class('127.0.0.1', 333, 'id123', 'password123') extends SocketSms {
-            public function sendBulkSmsRequest( string $message ): void
+            public function sendBulkSmsRequest(string $message): void
             {
-                parent::sendBulkSmsRequest( $message );
+                parent::sendBulkSmsRequest($message);
             }
 
             public function waitForResponse(string $request, string $response): string
@@ -36,13 +37,13 @@ class SocketSmsTest extends TestCase
         };
 
         // BulkSms
-        $sms->sendBulkSmsRequest("test message");
+        $sms->sendBulkSmsRequest('test message');
         $this->goipServer->receiveFrom();
         $response = $sms->waitForResponse('BulkSms', 'PASSWORD');
-        $this->assertEquals('PASSWORD id123'.PHP_EOL, $response);
+        $this->assertEquals('PASSWORD id123' . PHP_EOL, $response);
     }
 
-    public function testItCanSendAuthRequest() : void
+    public function testItCanSendAuthRequest(): void
     {
         $sms = new class('127.0.0.1', 333, 'id123', 'password123') extends SocketSms {
             public function sendAuthRequest(): void
@@ -60,15 +61,15 @@ class SocketSmsTest extends TestCase
         $sms->sendAuthRequest();
         $this->goipServer->receiveFrom();
         $response = $sms->waitForResponse('Auth', 'SEND');
-        $this->assertEquals('SEND id123'.PHP_EOL, $response);
+        $this->assertEquals('SEND id123' . PHP_EOL, $response);
     }
 
-    public function testItCanSendNumberRequest() : void
+    public function testItCanSendNumberRequest(): void
     {
         $sms = new class('127.0.0.1', 333, 'id123', 'password123') extends SocketSms {
-            public function sendNumberRequest( string $number ): void
+            public function sendNumberRequest(string $number): void
             {
-                parent::sendNumberRequest( $number );
+                parent::sendNumberRequest($number);
             }
 
             public function waitForResponse(string $request, string $response): string
@@ -81,10 +82,10 @@ class SocketSmsTest extends TestCase
         $sms->sendNumberRequest('999999999');
         $this->goipServer->receiveFrom();
         $response = $sms->waitForResponse('SendNumber', 'OK');
-        $this->assertEquals('OK id123 1 123'.PHP_EOL, $response);
+        $this->assertEquals('OK id123 1 123' . PHP_EOL, $response);
     }
 
-    public function testItCanSendEndRequest() : void
+    public function testItCanSendEndRequest(): void
     {
         $sms = new class('127.0.0.1', 333, 'id123', 'password123') extends SocketSms {
             public function sendEndRequest(): void
@@ -105,16 +106,16 @@ class SocketSmsTest extends TestCase
         $this->assertEquals('DONE id123', $response);
     }
 
-    public function testItShouldThrowSocketExceptionWhenGoipNotResponse() : void
+    public function testItShouldThrowSocketExceptionWhenGoipNotResponse(): void
     {
-        $this->expectException( SocketException::class );
+        $this->expectException(SocketException::class);
 
         $sms = new class('127.0.0.1', 333, 'id123', 'password123', [
-            'timeout' => 1
+            'timeout' => 1,
         ]) extends SocketSms {
-            public function sendBulkSmsRequest( string $message ): void
+            public function sendBulkSmsRequest(string $message): void
             {
-                parent::sendBulkSmsRequest( $message );
+                parent::sendBulkSmsRequest($message);
             }
 
             public function waitForResponse(string $request, string $response): string
@@ -124,20 +125,20 @@ class SocketSmsTest extends TestCase
         };
 
         // BulkSms
-        $sms->sendBulkSmsRequest("test message");
+        $sms->sendBulkSmsRequest('test message');
         $sms->waitForResponse('BulkSms', 'PASSWORD');
     }
 
-    public function testItShouldThrowGoipExceptionWhenGoipResponseWithError() : void
+    public function testItShouldThrowGoipExceptionWhenGoipResponseWithError(): void
     {
-        $this->expectException( GoipException::class );
+        $this->expectException(GoipException::class);
 
         $sms = new class('127.0.0.1', 333, 'id123', 'password123', [
-            'timeout' => 1
+            'timeout' => 1,
         ]) extends SocketSms {
-            public function sendBulkSmsRequest( string $message ): void
+            public function sendBulkSmsRequest(string $message): void
             {
-                parent::sendBulkSmsRequest( $message );
+                parent::sendBulkSmsRequest($message);
             }
 
             public function waitForResponse(string $request, string $response): string
@@ -147,12 +148,8 @@ class SocketSmsTest extends TestCase
         };
 
         // BulkSms
-        $sms->sendBulkSmsRequest("test message");
+        $sms->sendBulkSmsRequest('test message');
         $this->goipServer->receiveFrom(true);
         $response = $sms->waitForResponse('BulkSms', 'PASSWORD');
     }
-
-
 }
-
-

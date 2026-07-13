@@ -1,6 +1,7 @@
 <?php
 
 namespace Pikart\Goip\Tests\Sms;
+
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -11,9 +12,10 @@ use Pikart\Goip\Tests\TestCase;
 
 class HttpSmsTest extends TestCase
 {
-
     private HttpSms $sms;
+
     private string $host = 'http://192.168.0.11';
+
     protected int $line = 1;
 
     public function setUp(): void
@@ -33,31 +35,30 @@ class HttpSmsTest extends TestCase
             {
                 return parent::parseStatusXml($response);
             }
-
         };
     }
 
-    public function testItCanParseResponse() : void
+    public function testItCanParseResponse(): void
     {
         $exampleResponse = 'Sending,L1 Send SMS to:999999999; ID:00000e7c';
-        $response = $this->sms->parse( $exampleResponse );
+        $response = $this->sms->parse($exampleResponse);
 
         $this->assertEquals([
             'raw' => $exampleResponse,
-            'id'  => '00000e7c',
-            'status' => HttpSms::STATUS_SENDING
+            'id' => '00000e7c',
+            'status' => HttpSms::STATUS_SENDING,
         ], $response);
     }
 
-    public function testItShouldThrowExceptionIfGoipResponseWithError() : void
+    public function testItShouldThrowExceptionIfGoipResponseWithError(): void
     {
-        $this->expectException( GoipException::class );
+        $this->expectException(GoipException::class);
 
         $exampleResponse = 'ERROR,L2 GSM logout';
-        $this->sms->parse( $exampleResponse );
+        $this->sms->parse($exampleResponse);
     }
 
-    public function testItShouldThrowExceptionIfHostIsWrongAfterTimeout() : void
+    public function testItShouldThrowExceptionIfHostIsWrongAfterTimeout(): void
     {
         $this->expectException(ConnectException::class);
         $sms = new HttpSms('http://192.168.0.12', '1', 'admin', 'admin');
@@ -66,47 +67,47 @@ class HttpSmsTest extends TestCase
         $response = $sms->send('999999999', 'teest message');
     }
 
-    public function testItCanPrepareAddress() : void
+    public function testItCanPrepareAddress(): void
     {
-        $this->assertEquals( $this->host.'/default/en_US/send.html', $this->sms->prepareAddress('/default/en_US/send.html') );
-        $this->assertEquals( $this->host.'/default/en_US/send_status.xml', $this->sms->prepareAddress('/default/en_US/send_status.xml') );
+        $this->assertEquals($this->host . '/default/en_US/send.html', $this->sms->prepareAddress('/default/en_US/send.html'));
+        $this->assertEquals($this->host . '/default/en_US/send_status.xml', $this->sms->prepareAddress('/default/en_US/send_status.xml'));
     }
 
-    public function testItCanCheckStatusBySendId() : void
+    public function testItCanCheckStatusBySendId(): void
     {
         $mock = new MockHandler([
-            new Response(200, [], $this->exampleStatusList())
+            new Response(200, [], $this->exampleStatusList()),
         ]);
 
         $this->sms->setGuzzleConfig([
-            'handler' => HandlerStack::create($mock)
+            'handler' => HandlerStack::create($mock),
         ]);
 
-        $this->assertTrue( $this->sms->isSend('00000e7c') );
-        $this->assertFalse( $this->sms->isSend('00000e72') );
+        $this->assertTrue($this->sms->isSend('00000e7c'));
+        $this->assertFalse($this->sms->isSend('00000e72'));
 
     }
 
-    public function testItCanParseXmlStatusList() : void
+    public function testItCanParseXmlStatusList(): void
     {
-        $parsed = $this->sms->parseStatusXml( $this->exampleStatusList() );
+        $parsed = $this->sms->parseStatusXml($this->exampleStatusList());
 
         $this->assertEquals([
             'id' => '00000e7c',
             'status' => 'DONE',
-            'error'  => ''
+            'error' => '',
         ], $parsed);
     }
 
-    public function testItCanSendSms() : void
+    public function testItCanSendSms(): void
     {
         $mock = new MockHandler([
             new Response(200, [], 'Sending,L1 Send SMS to:999999999; ID:00000e7c'),
-            new Response(200, [], $this->exampleStatusList())
+            new Response(200, [], $this->exampleStatusList()),
         ]);
 
         $this->sms->setGuzzleConfig([
-            'handler' => HandlerStack::create($mock)
+            'handler' => HandlerStack::create($mock),
         ]);
 
         $response = $this->sms->send('999999999', 'test message');
@@ -114,16 +115,16 @@ class HttpSmsTest extends TestCase
         $this->assertEquals([
             'id' => '00000e7c',
             'raw' => 'Sending,L1 Send SMS to:999999999; ID:00000e7c',
-            'status' => HttpSms::STATUS_SEND
+            'status' => HttpSms::STATUS_SEND,
         ], $response);
     }
 
-    private function exampleStatusList( string $error = '' ) : string
+    private function exampleStatusList(string $error = ''): string
     {
         return '<send-sms-status>
                 <id1>00000e7c</id1>
                 <status1>DONE</status1>
-                <error1>'.$error.'</error1>
+                <error1>' . $error . '</error1>
                 <id2/>
                 <status2/>
                 <error2/>
@@ -148,5 +149,3 @@ class HttpSmsTest extends TestCase
                 </send-sms-status>';
     }
 }
-
-

@@ -7,23 +7,15 @@ namespace Pikart\Goip;
 class UdpServer extends Server
 {
     /**
-     * Ther Socket resource
-     * @var resource
+     * The Socket instance
      */
-    private $socket;
+    private \Socket $socket;
 
     /**
      * Loop sleep interval in milliseconds
-     *
-     * @var int
      */
     private int $loopSleep = 5000;
 
-    /**
-     * Set loop sleep
-     *
-     * @param int $loopSleep
-     */
     public function setLoopSleep(int $loopSleep): void
     {
         $this->loopSleep = $loopSleep;
@@ -37,9 +29,9 @@ class UdpServer extends Server
     public function run(): void
     {
         $this->createSocket();
-        while (!$this->stop) {
+        while (! $this->stop) {
             $request = $this->receive();
-            if (is_null($request)) {
+            if ($request === null) {
                 usleep($this->loopSleep);
                 continue;
             }
@@ -51,11 +43,13 @@ class UdpServer extends Server
     /**
      * Read from socket
      *
-     * @return Request|null
      * @throws Exceptions\SocketException
      */
     private function receive(): ?Request
     {
+        $buffer = '';
+        $host = '';
+        $port = 0;
         $rcvfrom = socket_recvfrom($this->socket, $buffer, 2048, 0, $host, $port);
 
         // If there was an error
@@ -73,15 +67,15 @@ class UdpServer extends Server
             return null;
         }
 
+        /** @var string $buffer */
+        /** @var string $host */
+        /** @var int $port */
         return new Request($buffer, $host, $port);
     }
 
     /**
      * Send message to client
      *
-     * @param string $message
-     * @param string $host
-     * @param int $port
      * @throws Exceptions\SocketException
      */
     protected function send(string $message, string $host, int $port): void
@@ -93,8 +87,6 @@ class UdpServer extends Server
     }
 
     /**
-     * Create socket
-     *
      * @throws Exceptions\SocketException
      */
     private function createSocket(): void
@@ -106,7 +98,7 @@ class UdpServer extends Server
 
         $this->socket = $socket;
 
-        if (!socket_bind($this->socket, $this->host, $this->port)) {
+        if (! socket_bind($this->socket, $this->host, $this->port)) {
             throw new Exceptions\SocketException($this->socketLastError());
         }
 
@@ -132,8 +124,6 @@ class UdpServer extends Server
 
     /**
      * Get last socket error
-     *
-     * @return string
      */
     private function socketLastError(): string
     {

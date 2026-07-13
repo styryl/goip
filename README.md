@@ -3,13 +3,21 @@ This package allow to send and receive SMS messages using GSM / VOIP Goip1, Goip
 ## Requirements
 
 ```bash
-PHP >= 7.4
+PHP ^8.5
 ```
 
 ## Installation
 
 ```bash
 composer require pikart/goip
+```
+
+## Development
+
+```bash
+make build
+make install
+make test
 ```
 
 ## Server usage instruction

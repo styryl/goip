@@ -7,29 +7,22 @@ namespace Pikart\Goip;
 use Pikart\Goip\Contracts\MessageDispatcher;
 use Pikart\Goip\Contracts\MessageListener;
 
-/**
- * @package Pikart\Goip
- */
 class DefaultMessageDispatcher implements MessageDispatcher
 {
     /**
      * The registered message listeners.
-     * @var mixed[]
+     * @var array<string, array<string, object>>
      */
     private array $listeners = [
-        Message::class => []
+        Message::class => [],
     ];
 
     /**
      * Register an message listener with the dispatcher for concrete message.
-     *
-     * @param string $type
-     * @param object $listener
-     * @return string
      */
     public function listen(string $type, object $listener): string
     {
-        if (!is_callable($listener) && !$listener instanceof MessageListener) {
+        if (! is_callable($listener) && ! $listener instanceof MessageListener) {
             $exceptionMessage = 'Listener must be object that is callable or implements MessageListener contract';
             throw new \InvalidArgumentException($exceptionMessage);
         }
@@ -41,9 +34,6 @@ class DefaultMessageDispatcher implements MessageDispatcher
 
     /**
      * Register an message listener with the dispatcher for all messages
-     *
-     * @param object $listener
-     * @return string
      */
     public function listenAll(object $listener): string
     {
@@ -53,7 +43,7 @@ class DefaultMessageDispatcher implements MessageDispatcher
     /**
      * Get all register listeners
      *
-     * @return mixed[]
+     * @return array<string, array<string, object>>
      */
     public function listeners(): array
     {
@@ -62,12 +52,10 @@ class DefaultMessageDispatcher implements MessageDispatcher
 
     /**
      * Remove all registered listeners
-     *
-     * @param string|null $type
      */
     public function removeAll(?string $type = null): void
     {
-        if (!is_null($type) && array_key_exists($type, $this->listeners)) {
+        if ($type !== null && array_key_exists($type, $this->listeners)) {
             unset($this->listeners[$type]);
             return;
         }
@@ -77,13 +65,11 @@ class DefaultMessageDispatcher implements MessageDispatcher
 
     /**
      * Remove listener by id
-     *
-     * @param string $listenerIdentifier
      */
     public function remove(string $listenerIdentifier): void
     {
         foreach ($this->listeners as $type => $listeners) {
-            if (is_array($listeners) && array_key_exists($listenerIdentifier, $listeners)) {
+            if (array_key_exists($listenerIdentifier, $listeners)) {
                 unset($this->listeners[$type][$listenerIdentifier]);
             }
         }
@@ -91,14 +77,11 @@ class DefaultMessageDispatcher implements MessageDispatcher
 
     /**
      * Get listener by id
-     *
-     * @param string $listenerIdentifier
-     * @return object|null
      */
     public function get(string $listenerIdentifier): ?object
     {
         foreach ($this->listeners as $listenerType) {
-            if (is_array($listenerType) && array_key_exists($listenerIdentifier, $listenerType)) {
+            if (array_key_exists($listenerIdentifier, $listenerType)) {
                 return $listenerType[$listenerIdentifier];
             }
         }
@@ -108,12 +91,9 @@ class DefaultMessageDispatcher implements MessageDispatcher
 
     /**
      * Dispatch messages to listeners
-     *
-     * @param Message $message
      */
     public function dispatch(Message $message): void
     {
-
         $listeners = $this->listeners[Message::class];
 
         $type = get_class($message);
@@ -136,9 +116,6 @@ class DefaultMessageDispatcher implements MessageDispatcher
 
     /**
      * Create unique id
-     *
-     * @param object $callable
-     * @return string
      */
     private function getHashId(object $callable): string
     {

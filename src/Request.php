@@ -4,44 +4,30 @@ declare(strict_types=1);
 
 namespace Pikart\Goip;
 
-/**
- * @package Pikart\Goip
- */
 class Request
 {
     /**
      * The raw message from client
-     * @var string
      */
     private string $buffer;
 
     /**
      * The remote host
-     *
-     * @var string
      */
     private string $host;
 
     /**
      * The remote port
-     * @var int
      */
     private int $port;
 
     /**
      * Parsed attributes from raw buffer
      *
-     * @var mixed[]
+     * @var array<string, string>
      */
     private array $attributes;
 
-    /**
-     * Request constructor.
-     *
-     * @param string $buffer
-     * @param string $host
-     * @param int $port
-     */
     public function __construct(string $buffer, string $host, int $port)
     {
         $this->buffer = $buffer;
@@ -52,8 +38,6 @@ class Request
 
     /**
      * Get remote host
-     *
-     * @return string
      */
     public function host(): string
     {
@@ -62,8 +46,6 @@ class Request
 
     /**
      * Get remote port
-     *
-     * @return int
      */
     public function port(): int
     {
@@ -72,8 +54,6 @@ class Request
 
     /**
      * Get raw buffer
-     *
-     * @return string
      */
     public function buffer(): string
     {
@@ -83,7 +63,7 @@ class Request
     /**
      * Get all attributes
      *
-     * @return mixed[]
+     * @return array<string, string>
      */
     public function all(): array
     {
@@ -92,9 +72,6 @@ class Request
 
     /**
      * Check if attribute exists
-     *
-     * @param string $key
-     * @return bool
      */
     public function has(string $key): bool
     {
@@ -103,29 +80,21 @@ class Request
 
     /**
      * Get concrete attribute from attributes
-     *
-     * @param string $key
-     * @return string|null
      */
     public function get(string $key): ?string
     {
         return $this->has($key) ? $this->attributes[$key] : null;
     }
 
-    /**
-     * @param string $key
-     * @return int|null
-     */
     public function getAsInt(string $key): ?int
     {
-        return $this->has($key) ? (int)$this->attributes[$key] : null;
+        return $this->has($key) ? (int) $this->attributes[$key] : null;
     }
 
     /**
      * Parse raw buffer to attributes
      *
-     * @param string $buffer
-     * @return mixed[]
+     * @return array<string, string>
      */
     private function parse(string $buffer): array
     {
