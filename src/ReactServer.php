@@ -6,7 +6,7 @@ namespace Pikart\Goip;
 
 use React\Datagram\Factory as DatagramFactory;
 use React\Datagram\Socket;
-use React\EventLoop\Factory as LoopFactory;
+use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use React\Promise\PromiseInterface;
 
@@ -31,7 +31,7 @@ class ReactServer extends Server
      */
     private function createSocket(): LoopInterface
     {
-        $loop = LoopFactory::create();
+        $loop = Loop::get();
         $factory = new DatagramFactory($loop);
 
         /** @var PromiseInterface<Socket> $server */
