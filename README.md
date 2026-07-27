@@ -20,6 +20,23 @@ make install
 make test
 ```
 
+### Debug CLI
+
+```bash
+php bin/goip-debug debug:server --host=0.0.0.0 --port=44444 --driver=udp
+php bin/goip-debug debug:server --host=0.0.0.0 --port=44444 --driver=react
+
+php bin/goip-debug debug:send-sms --transport=http --host=http://192.168.0.11 --line=1 --login=admin --password=admin --to=999999999 --message="test"
+php bin/goip-debug debug:send-sms --transport=socket --host=192.168.0.11 --port=9991 --session=123 --password=admin --to=999999999 --message="test"
+```
+
+Docker:
+
+```bash
+cp .env.example .env
+make debug_server
+```
+
 ## Server usage instruction
 
 To start receiving messages from Goip gateways you need to create and start a server. 

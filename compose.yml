@@ -6,3 +6,18 @@ services:
       COMPOSER_HOME: /tmp/composer
     volumes:
       - .:/app
+
+  debug-server:
+    build: .
+    command: bin/goip-debug debug:server
+    working_dir: /app
+    environment:
+      COMPOSER_HOME: /tmp/composer
+      GOIP_DEBUG_HOST: ${GOIP_DEBUG_HOST:-0.0.0.0}
+      GOIP_DEBUG_PORT: ${GOIP_DEBUG_PORT:-44444}
+      GOIP_DEBUG_DRIVER: ${GOIP_DEBUG_DRIVER:-udp}
+      GOIP_DEBUG_SLEEP: ${GOIP_DEBUG_SLEEP:-5000}
+    volumes:
+      - .:/app
+    ports:
+      - "${GOIP_DEBUG_PORT:-44444}:${GOIP_DEBUG_PORT:-44444}/udp"

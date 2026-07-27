@@ -31,5 +31,8 @@ phpstan:
 phpunit:
 	$(COMPOSE_RUN) sh -c 'vendor/bin/phpunit --testdox'
 
+debug_server:
+	docker compose up debug-server
+
 bash:
 	$(COMPOSE_RUN) sh

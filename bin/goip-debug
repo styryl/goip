@@ -1,0 +1,214 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Pikart\Goip\Message;
+use Pikart\Goip\ReactServer;
+use Pikart\Goip\ServerFactory;
+use Pikart\Goip\Sms\HttpSms;
+use Pikart\Goip\Sms\SocketSms;
+use Pikart\Goip\UdpServer;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+/**
+ * @param list<string> $args
+ * @return array<string, string|bool>
+ */
+function options(array $args): array
+{
+    $options = [];
+
+    for ($i = 0; $i < count($args); $i++) {
+        $arg = $args[$i];
+        if (! str_starts_with($arg, '--')) {
+            continue;
+        }
+
+        $arg = substr($arg, 2);
+        if (str_contains($arg, '=')) {
+            [$key, $value] = explode('=', $arg, 2);
+            $options[$key] = $value;
+            continue;
+        }
+
+        $next = $args[$i + 1] ?? null;
+        if ($next !== null && ! str_starts_with($next, '--')) {
+            $options[$arg] = $next;
+            $i++;
+            continue;
+        }
+
+        $options[$arg] = true;
+    }
+
+    return $options;
+}
+
+/**
+ * @param array<string, string|bool> $options
+ */
+function opt(array $options, string $name, ?string $default = null, ?string $env = null): string
+{
+    $value = $options[$name] ?? env($env) ?? $default;
+    if ($value === null || $value === true || $value === '') {
+        fail(sprintf('Missing --%s option.', $name));
+    }
+
+    return $value;
+}
+
+function env(?string $name): ?string
+{
+    if ($name === null) {
+        return null;
+    }
+
+    $value = getenv($name);
+    return $value === false ? null : $value;
+}
+
+/**
+ * @param array<string, string|bool> $options
+ */
+function intOpt(array $options, string $name, ?int $default = null, ?string $env = null): int
+{
+    $value = opt($options, $name, $default === null ? null : (string) $default, $env);
+    if (filter_var($value, FILTER_VALIDATE_INT) === false) {
+        fail(sprintf('--%s must be an integer.', $name));
+    }
+
+    return (int) $value;
+}
+
+function fail(string $message): never
+{
+    fwrite(STDERR, $message . PHP_EOL);
+    exit(1);
+}
+
+function usage(): never
+{
+    echo <<<'TXT'
+Usage:
+  php bin/goip-debug debug:server [--host=0.0.0.0] [--port=44444] [--driver=udp|react] [--sleep=5000]
+  php bin/goip-debug debug:send-sms --transport=http --host=http://192.168.0.11 --line=1 --login=admin --password=admin --to=999999999 --message="test"
+  php bin/goip-debug debug:send-sms --transport=socket --host=192.168.0.11 --port=9991 --session=123 --password=admin --to=999999999 --message="test" [--timeout=5]
+
+TXT;
+    exit(0);
+}
+
+/**
+ * @param array<string, string|bool> $options
+ */
+function runServer(array $options): never
+{
+    $host = opt($options, 'host', '0.0.0.0', 'GOIP_DEBUG_HOST');
+    $port = intOpt($options, 'port', 44444, 'GOIP_DEBUG_PORT');
+    $driver = opt($options, 'driver', 'udp', 'GOIP_DEBUG_DRIVER');
+    $serverClass = match ($driver) {
+        'udp' => UdpServer::class,
+        'react' => ReactServer::class,
+        default => fail('--driver must be udp or react.'),
+    };
+
+    $server = ServerFactory::default(
+        $serverClass,
+        $host,
+        $port
+    );
+
+    if ($server instanceof UdpServer) {
+        $server->setLoopSleep(intOpt($options, 'sleep', 5000, 'GOIP_DEBUG_SLEEP'));
+    }
+
+    $server->listenAll(static function (Message $message): void {
+        echo json_encode([
+            'time' => date(DATE_ATOM),
+            'type' => $message::class,
+            'remote' => $message->request()->host() . ':' . $message->request()->port(),
+            'raw' => $message->request()->buffer(),
+            'attributes' => $message->attributes(),
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . PHP_EOL;
+    });
+
+    printf("Listening on %s:%d using %s\n", $host, $port, $driver);
+    $server->run();
+    exit(0);
+}
+
+/**
+ * @param array<string, string|bool> $options
+ */
+function sendSms(array $options): never
+{
+    $transport = opt($options, 'transport', null, 'GOIP_SMS_TRANSPORT');
+    $number = opt($options, 'to', null, 'GOIP_SMS_TO');
+    $message = opt($options, 'message', null, 'GOIP_SMS_MESSAGE');
+
+    $response = match ($transport) {
+        'http' => sendHttpSms($options, $number, $message),
+        'socket' => sendSocketSms($options, $number, $message),
+        default => fail('--transport must be http or socket.'),
+    };
+
+    echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . PHP_EOL;
+    exit(0);
+}
+
+/**
+ * @param array<string, string|bool> $options
+ * @return array<string, string>
+ */
+function sendHttpSms(array $options, string $number, string $message): array
+{
+    $sms = new HttpSms(
+        opt($options, 'host', null, 'GOIP_SMS_HOST'),
+        intOpt($options, 'line', null, 'GOIP_SMS_LINE'),
+        opt($options, 'login', null, 'GOIP_SMS_LOGIN'),
+        opt($options, 'password', null, 'GOIP_SMS_PASSWORD')
+    );
+
+    return $sms->send($number, $message);
+}
+
+/**
+ * @param array<string, string|bool> $options
+ * @return array{sendid: string, telid: string, sms_no: string, raw: string}
+ */
+function sendSocketSms(array $options, string $number, string $message): array
+{
+    $sms = new SocketSms(
+        opt($options, 'host', null, 'GOIP_SMS_HOST'),
+        intOpt($options, 'port', null, 'GOIP_SMS_PORT'),
+        opt($options, 'session', null, 'GOIP_SMS_SESSION'),
+        opt($options, 'password', null, 'GOIP_SMS_PASSWORD'),
+        ['timeout' => intOpt($options, 'timeout', 5, 'GOIP_SMS_TIMEOUT')]
+    );
+
+    return $sms->send($number, $message);
+}
+
+$command = $argv[1] ?? null;
+$args = array_slice($argv, 2);
+
+if ($command === null || $command === '--help' || $command === '-h') {
+    usage();
+}
+
+$wantsHelp = in_array('--help', $args, true) || in_array('-h', $args, true);
+if ($wantsHelp) {
+    usage();
+}
+
+try {
+    match ($command) {
+        'debug:server' => runServer(options($args)),
+        'debug:send-sms' => sendSms(options($args)),
+        default => fail(sprintf('Unknown command: %s', $command)),
+    };
+} catch (Throwable $exception) {
+    fail($exception->getMessage());
+}
