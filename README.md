@@ -1,15 +1,220 @@
-This package allow to send and receive SMS messages using GSM / VOIP Goip1, Goip4, Goip8, Goip16 gateways from Hybertone / Dbltek company. SMS can be received via the UDP protocol using php sockets or reactphp. The SMS can be sent via UDP or HTTP. The package is used in a production environment with four Goip16 gateways connected (64 lines). Additionally, it is possible to receive basic information about the state and status of individual GSM gates (lines).
+# GoIP
+
+PHP client and UDP server for Hybertone / Dbltek GoIP GSM gateways.
+
+The package can receive gateway messages over UDP and send SMS messages through
+the GoIP HTTP or UDP SMS APIs. It supports GoIP1, GoIP4, GoIP8 and GoIP16
+devices.
+
+## Features
+
+- Receive GoIP UDP packets with PHP sockets or ReactPHP
+- Send SMS messages through the GoIP HTTP API
+- Send SMS messages through the GoIP UDP socket API
+- Handle incoming SMS, delivery reports, call events and line state changes
+- Run a local debug receiver from the command line
+
+## Contents
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Receiving Messages](#receiving-messages)
+- [Sending SMS](#sending-sms)
+- [Debug CLI](#debug-cli)
+- [Development](#development)
 
 ## Requirements
 
-```bash
-PHP ^8.5
-```
+- PHP `^8.5`
+- `ext-sockets`
 
 ## Installation
 
 ```bash
 composer require pikart/goip
+```
+
+## Quick Start
+
+Start a UDP receiver:
+
+```php
+use Pikart\Goip\Message;
+use Pikart\Goip\ReactServer;
+use Pikart\Goip\ServerFactory;
+
+$server = ServerFactory::default(ReactServer::class, '0.0.0.0', 44444);
+
+$server->listenAll(static function (Message $message): void {
+    var_dump($message->attributes());
+});
+
+$server->run();
+```
+
+Send an SMS over HTTP:
+
+```php
+use Pikart\Goip\Sms\HttpSms;
+
+$sms = new HttpSms('http://192.168.10.23', 1, 'goip-admin', 'secret');
+
+$response = $sms->send('+15551234567', 'Your verification code is 482913.');
+```
+
+## Receiving Messages
+
+Two server implementations are available:
+
+| Server | Runtime | Use when |
+| --- | --- | --- |
+| `Pikart\Goip\UdpServer` | PHP sockets | You want the smallest blocking server |
+| `Pikart\Goip\ReactServer` | ReactPHP | You already use a ReactPHP event loop |
+
+```php
+use Pikart\Goip\Messages\ReceiveMessage;
+use Pikart\Goip\ReactServer;
+use Pikart\Goip\ServerFactory;
+
+$server = ServerFactory::default(ReactServer::class, '0.0.0.0', 44444);
+
+$server->listen(ReceiveMessage::class, static function (ReceiveMessage $message): void {
+    $sender = $message->srcnum();
+    $text = $message->msg();
+});
+
+$server->run();
+```
+
+To listen for every supported message:
+
+```php
+use Pikart\Goip\Message;
+
+$server->listenAll(static function (Message $message): void {
+    $type = $message::class;
+    $attributes = $message->attributes();
+    $remoteHost = $message->request()->host();
+    $remotePort = $message->request()->port();
+});
+```
+
+Listeners can be removed by their returned identifier:
+
+```php
+$listenerId = $server->listenAll($listener);
+
+$server->off($listenerId);
+```
+
+### Factory
+
+```php
+ServerFactory::default(string $serverClass, string $host, int $port, array $args = []): Server
+```
+
+Supported message classes:
+
+- `Pikart\Goip\Messages\RequestMessage` - keep-alive packets with gateway line information
+- `Pikart\Goip\Messages\ReceiveMessage` - incoming SMS
+- `Pikart\Goip\Messages\DeliverMessage` - SMS delivery report
+- `Pikart\Goip\Messages\HangupMessage` - call end
+- `Pikart\Goip\Messages\RecordMessage` - call start
+- `Pikart\Goip\Messages\StateMessage` - gateway line state change
+- `Pikart\Goip\Messages\ExpiryMessage` - expiry notification
+- `Pikart\Goip\Messages\NotSupportedMessage` - unsupported packet type
+
+For production receivers, keep listener work short and hand off heavier
+processing to a queue.
+
+## Sending SMS
+
+Both SMS clients implement `Pikart\Goip\Contracts\Sms`:
+
+```php
+public function send(string $number, string $message): array;
+```
+
+### HTTP
+
+```php
+use Pikart\Goip\Sms\HttpSms;
+
+$sms = new HttpSms('http://192.168.10.23', 1, 'goip-admin', 'secret');
+$sms->setGuzzleTimeout(5);
+
+$response = $sms->send('+15551234567', 'Your verification code is 482913.');
+```
+
+Successful response:
+
+```php
+[
+    'id' => '0000021f',
+    'raw' => 'Sending,L1 Send SMS to:+15551234567; ID:0000021f',
+    'status' => 'send',
+]
+```
+
+### UDP Socket
+
+```php
+use Pikart\Goip\Sms\SocketSms;
+
+$sms = new SocketSms(
+    '192.168.10.23',
+    9991,
+    '123',
+    'secret',
+    ['timeout' => 5]
+);
+
+$response = $sms->send('+15551234567', 'Your verification code is 482913.');
+```
+
+Successful response:
+
+```php
+[
+    'sendid' => '123',
+    'telid' => '1',
+    'sms_no' => '0',
+    'raw' => 'OK 123 1 0',
+]
+```
+
+## Debug CLI
+
+The repository includes a small development CLI:
+
+```bash
+php bin/goip-debug debug:server --host=0.0.0.0 --port=44444 --driver=udp
+php bin/goip-debug debug:server --host=0.0.0.0 --port=44444 --driver=react
+```
+
+It prints received packets as JSON. CLI options override environment variables.
+
+Server options:
+
+| Option | Env | Default |
+| --- | --- | --- |
+| `--host` | `GOIP_DEBUG_HOST` | `0.0.0.0` |
+| `--port` | `GOIP_DEBUG_PORT` | `44444` |
+| `--driver` | `GOIP_DEBUG_DRIVER` | `udp` |
+| `--sleep` | `GOIP_DEBUG_SLEEP` | `5000` |
+
+Docker defaults for the debug server can be configured in `.env`:
+
+```bash
+cp .env.example .env
+make debug_server
+```
+
+Manual SMS checks can be run with:
+
+```bash
+php bin/goip-debug debug:send-sms --transport=http --host=http://192.168.10.23 --line=1 --login=goip-admin --password=secret --to=+15551234567 --message="Your verification code is 482913."
+php bin/goip-debug debug:send-sms --transport=socket --host=192.168.10.23 --port=9991 --session=sms-20260727-001 --password=secret --to=+15551234567 --message="Your verification code is 482913."
 ```
 
 ## Development
@@ -20,252 +225,11 @@ make install
 make test
 ```
 
-### Debug CLI
+Run checks separately:
 
 ```bash
-php bin/goip-debug debug:server --host=0.0.0.0 --port=44444 --driver=udp
-php bin/goip-debug debug:server --host=0.0.0.0 --port=44444 --driver=react
-
-php bin/goip-debug debug:send-sms --transport=http --host=http://192.168.0.11 --line=1 --login=admin --password=admin --to=999999999 --message="test"
-php bin/goip-debug debug:send-sms --transport=socket --host=192.168.0.11 --port=9991 --session=123 --password=admin --to=999999999 --message="test"
-```
-
-Docker:
-
-```bash
-cp .env.example .env
-make debug_server
-```
-
-## Server usage instruction
-
-To start receiving messages from Goip gateways you need to create and start a server. 
-
-Two implementations are possible:
-
-```php
- \Pikart\Goip\UdpServer::class // php sockets
- \Pikart\Goip\ReactServer::class // reactphp
-```
-
-Creating a server using php sockets:
-
-```php
-$server = \Pikart\Goip\ServerFactory::default( \Pikart\Goip\UdpServer::class, '0.0.0.0', 333);
-```
-
-Creating a server using reactphp:
-
-```php
-$server = \Pikart\Goip\ServerFactory::default( \Pikart\Goip\ReactServer::class, '0.0.0.0', 333);
-```
-
-Method  **\Pikart\Goip\ServerFactory::default() : Server** creates new Server instance, it takes four parameters:
-
-1. $serverClass (**string**) - Server implementation \Pikart\Goip\Server::class
-2. $host (**string**) - server host address
-3. $port (**int**) - server port
-4. $args (**array**) optional - additional parameters
-
-The server allows to listen messages received from Goip trough the Observer pattern.
-
-#### Register message listener
-
-```php
-use Pikart\Goip\ServerFactory;
-use Pikart\Goip\ReactServer;
-use Pikart\Goip\Message;
-use Pikart\Goip\Messages\RequestMessage;
-use Pikart\Goip\Messages\ReceiveMessage;
-
-$server = ServerFactory::default( ReactServer::class, '0.0.0.0', 333);
-
-// Listening to all incoming messages
-$listenerId1 = $server->listenAll(function (Message $message){
-    // Request message
-    if( $message instanceof RequestMessage)
-    {
-        var_dump( $message );
-    }
-
-    // Receive message
-    if( $message instanceof ReceiveMessage)
-    {
-        var_dump( $message );
-    }
-
-    // Message
-    var_dump( $message );
-
-});
-
-// Listening to a concrete message
-$listenerId2 = $server->listen( RequestMessage::class, function (RequestMessage $message){
-    var_dump( $message );
-});
-
-$listenerId3 = $server->listen( ReceiveMessage::class, function (ReceiveMessage $message){
-    var_dump( $message );
-});
-
-// Remove listener 1
-$server->off($listenerId1);
-// Remove listener 2
-$server->off($listenerId2);
-// Remove listener 3
-$server->off($listenerId3);
-
-```
-It's highly recommended to use external queue system like RabbitMQ or Laravel Queues to process incoming messages.
-
-#### Server startup
-
-```php
-use Pikart\Goip\ServerFactory;
-use Pikart\Goip\ReactServer;
-use Pikart\Goip\Message;
-
-$server = ServerFactory::default( ReactServer::class, '0.0.0.0', 333);
-
-// Listening to all incoming messages
-$server->listenAll(function (Message $message){
-    // Message
-    var_dump( $message );
-});
-
-$server->run();
-```
-
-#### Message types
-
-```php
-\Pikart\Goip\Messages\RequestMessage::class // Keep Alive packets with gateway (line) information
-\Pikart\Goip\Messages\DeliverMessage::class // SMS delivery report
-\Pikart\Goip\Messages\HangupMessage::class // End telephone call
-\Pikart\Goip\Messages\ReceiveMessage::class // Incoming SMS
-\Pikart\Goip\Messages\RecordMessage::class // Start a phone call
-\Pikart\Goip\Messages\StateMessage::class // Change of gate (line) status
-\Pikart\Goip\Messages\NotSupportedMessage::class // Message not supported by package
-\Pikart\Goip\Message::class // Main abstract class
-```
-
-#### Message attributes and properties
-
-```php
-use Pikart\Goip\ServerFactory;
-use Pikart\Goip\ReactServer;
-use Pikart\Goip\Message;
-use Pikart\Goip\Messages\ReceiveMessage;
-
-$server = ServerFactory::default( ReactServer::class, '0.0.0.0', 333);
-
-$server->listenAll(function (Message $message){
-    // Array of all attributes
-    $attributes = $message->attributes();
-
-    // Pikart\Goip\Request::class Access to raw request from goip
-    $request = $message->request();
-
-    // Show remote host and port
-    $remoteHost = $message->request()->host();
-    $remotePort = $message->request()->port();
-
-});
-
-// ReceiveMessage
-$server->listen( ReceiveMessage::class, function ( ReceiveMessage $message ) {
-    // Received text message
-    $smsTextMessage = $message->msg();
-
-    // Sender phone number
-    $phoneNumber = $message->srcnum();
-
-    // Password from goip
-    $goipPassword = $message->password();
-
-    // Show remote host and port
-    $remoteHost = $message->request()->host();
-    $remotePort = $message->request()->port();
-});
-```
-## Sending a message
-
-#### Sending via UDP socket
-
-```php
-use Pikart\Goip\Sms\SocketSms;
-
-/**
-* SocketSms constructor.
-*
-* @param string $host Goip host
-* @param int $port Goip port
-* @param string $id Unique sending session id
-* @param string $password Goip password
-* @param array|null $options
-*/
-$sms = new SocketSms(
-    '192.168.0.11',
-    9991,
-    123,
-    'password',
-    ['timeout' => 30]
-);
-
-/**
-* Send sms
-*
-* @param string $number Phone number
-* @param string $message Text message
-* @return array Response from goip
-* @throws GoipException
-* @throws SocketException
-* @throws TimeoutException
-*/
-$response = $sms->send('999999999', 'text message');
-
-var_dump( $response );
-
-// response from goip
-array(4) {
-  ["sendid"]=>string(3) "123" // unique sendid
-  ["telid"]=>string(1) "1" // session id
-  ["sms_no"]=> string(1) "0" // sms count number
-  ["raw"]=>string(12) "OK 123 1 0" // raw response
-}
-
-```
-
-#### Sending via HTTP
-
-```php
-use Pikart\Goip\Sms\HttpSms;
-
-/**
-* HttpSms constructor.
-*
-* @param string $host Goip host for example: http://192.168.0.11
-* @param int $line Goip line number,
-* @param string $login Goip login
-* @param string $password Goip password
-*/
-$sms = new HttpSms('http://192.168.0.11',1, 'admin', 'admin');
-
-/**
-* Send sms
-*
-* @param string $number Phone number
-* @param string $message Text message
-* @return array
-* @throws GoipException
-*/
-$response = $sms->send('999999999', 'text message');
-
-var_dump( $response );
-
-array(3) {
-    ["id"]=> string(8) "0000021f" // send id
-    ["raw"]=> string(45) "Sending,L1 Send SMS to:999999999; ID:0000021f" // Raw response
-    ["status"]=> string(4) "send" // send status
-}
+make ecs
+make phpmd
+make phpstan
+make phpunit
 ```
