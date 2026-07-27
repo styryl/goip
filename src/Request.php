@@ -100,7 +100,7 @@ class Request
     {
         $arr = explode(';', $buffer);
         $data = [];
-        foreach ($arr as $value) {
+        foreach ($arr as $index => $value) {
             $parts = explode(':', $value);
             $key = array_shift($parts);
             $val = implode(':', $parts);
@@ -109,7 +109,18 @@ class Request
                 continue;
             }
 
-            $data[mb_strtolower($key)] = $val;
+            $key = mb_strtolower($key);
+
+            if ($key === 'msg') {
+                $data[$key] = implode(';', array_merge([$val], array_slice($arr, $index + 1)));
+                break;
+            }
+
+            if ($key === 'num' && str_contains($val, ',cause:')) {
+                [$val, $data['cause']] = explode(',cause:', $val, 2);
+            }
+
+            $data[$key] = $val;
         }
 
         return $data;

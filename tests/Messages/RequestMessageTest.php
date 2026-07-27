@@ -21,7 +21,7 @@ class RequestMessageTest extends TestCase
 
     public function testItCanReturnAck(): void
     {
-        $this->assertEquals('req:' . $this->request->get('req') . ';status:200;', $this->message->ack());
+        $this->assertEquals('reg:' . $this->request->get('req') . ';status:0;', $this->message->ack());
         $this->assertIsInt($this->message->req());
     }
 

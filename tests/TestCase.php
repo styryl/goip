@@ -21,8 +21,10 @@ class TestCase extends \PHPUnit\Framework\TestCase
             'state' => 'STATE:446;id:c1;password:gateway_password;gsm_remain_state:DIALING:999999999',
             'record' => 'RECORD:445;id:c1;password:gateway_password;dir:2;num:999999999',
             'hangup' => 'HANGUP:442;id:c1;password:gateway_password;num:,cause:"Normal call clearing',
+            'hangup_with_cause' => 'HANGUP:442;id:c1;password:gateway_password;num:,cause:16',
             'receive' => 'RECEIVE:441;id:c1;password:gateway_password;srcnum:100;msg:This is sample sms message',
             'deliver' => 'DELIVER:429;id:c1;password:gateway_password;sms_no:3;state:0;num:999999999',
+            'expiry' => 'EXPIRY:1785167081;id:c1;password:gateway_password;exp:0',
             'other' => 'not supported message from goip?',
         ];
 

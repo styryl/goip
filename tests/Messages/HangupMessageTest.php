@@ -15,7 +15,7 @@ class HangupMessageTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->request = new Request($this->sampleBuffers('hangup'), '0.0.0.0', 0);
+        $this->request = new Request($this->sampleBuffers('hangup_with_cause'), '0.0.0.0', 0);
         $this->message = new HangupMessage($this->request);
     }
 
@@ -47,5 +47,11 @@ class HangupMessageTest extends TestCase
     {
         $this->assertEquals($this->request->get('num'), $this->message->num());
         $this->assertIsString($this->message->num());
+    }
+
+    public function testItCanReturnCause(): void
+    {
+        $this->assertEquals($this->request->get('cause'), $this->message->cause());
+        $this->assertIsInt($this->message->cause());
     }
 }

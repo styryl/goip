@@ -33,4 +33,10 @@ class HangupMessage extends Message
         return $this->request()
             ->get('num');
     }
+
+    public function cause(): ?int
+    {
+        return $this->request()
+            ->getAsInt('cause');
+    }
 }

@@ -6,6 +6,7 @@ namespace Pikart\Goip;
 
 use Pikart\Goip\Contracts\MessageFactory;
 use Pikart\Goip\Messages\DeliverMessage;
+use Pikart\Goip\Messages\ExpiryMessage;
 use Pikart\Goip\Messages\HangupMessage;
 use Pikart\Goip\Messages\NotSupportedMessage;
 use Pikart\Goip\Messages\ReceiveMessage;
@@ -27,6 +28,7 @@ class DefaultMessageFactory implements MessageFactory
         'hangup' => HangupMessage::class,
         'receive' => ReceiveMessage::class,
         'deliver' => DeliverMessage::class,
+        'expiry' => ExpiryMessage::class,
     ];
 
     /**

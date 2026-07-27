@@ -5,6 +5,7 @@ namespace Pikart\Goip\Tests;
 use Pikart\Goip\DefaultMessageFactory;
 use Pikart\Goip\Message;
 use Pikart\Goip\Messages\DeliverMessage;
+use Pikart\Goip\Messages\ExpiryMessage;
 use Pikart\Goip\Messages\HangupMessage;
 use Pikart\Goip\Messages\NotSupportedMessage;
 use Pikart\Goip\Messages\ReceiveMessage;
@@ -50,6 +51,11 @@ class DefaultMessageFactoryTest extends TestCase
     public function testItCanMakeDeliverMessage(): void
     {
         $this->assertInstanceOf(DeliverMessage::class, $this->makeMessage('deliver'));
+    }
+
+    public function testItCanMakeExpiryMessage(): void
+    {
+        $this->assertInstanceOf(ExpiryMessage::class, $this->makeMessage('expiry'));
     }
 
     public function testItMakeNotSupportedMessageIfRequestTypeIsNotSupported(): void
