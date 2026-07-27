@@ -8,17 +8,11 @@ use Pikart\Goip\Message;
 
 class RecordMessage extends Message
 {
-    /**
-     * Ack message
-     */
     public function ack(): ?string
     {
         return 'RECORD ' . $this->request()->get('record') . ' OK';
     }
 
-    /**
-     * Record count number
-     */
     public function record(): ?int
     {
         return $this->request()
@@ -31,9 +25,6 @@ class RecordMessage extends Message
             ->getAsInt('dir');
     }
 
-    /**
-     * Phone number
-     */
     public function num(): ?string
     {
         return $this->request()

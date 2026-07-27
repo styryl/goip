@@ -13,18 +13,12 @@ class StateMessage extends Message
         return 'STATE ' . $this->request()->get('state') . ' OK';
     }
 
-    /**
-     * Get state count number
-     */
     public function state(): ?int
     {
         return $this->request()
             ->getAsInt('state');
     }
 
-    /**
-     * Get GSM line state
-     */
     public function gsmRemainState(): ?string
     {
         return $this->request()

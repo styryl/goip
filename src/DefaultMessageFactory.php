@@ -17,8 +17,6 @@ use Pikart\Goip\Messages\StateMessage;
 class DefaultMessageFactory implements MessageFactory
 {
     /**
-     * The available message types
-     *
      * @var array<string, class-string<Message>>
      */
     protected array $messages = [
@@ -31,12 +29,8 @@ class DefaultMessageFactory implements MessageFactory
         'expiry' => ExpiryMessage::class,
     ];
 
-    /**
-     * Make concrete message from Request
-     */
     public function make(Request $request): Message
     {
-        // First key of parsed buffer is type of message
         $type = (string) array_key_first($request->all());
 
         if (array_key_exists($type, $this->messages)) {

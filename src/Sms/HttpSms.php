@@ -10,71 +10,33 @@ use Pikart\Goip\Exceptions\GoipException;
 
 class HttpSms implements Sms
 {
-    /**
-     * Goip host
-     */
     private string $host;
 
-    /**
-     * Goip line number
-     */
     private int $line;
 
-    /**
-     * Goip login
-     */
     private string $login;
 
-    /**
-     * Goip password
-     */
     private string $password;
 
-    /**
-     * Guzzle Client
-     */
     private Client $guzzleClient;
 
-    /**
-     * Guzzle timeout
-     */
     private int $guzzleTimeout = 3;
 
     /**
-     * Guzzle config
-     *
      * @var mixed[]
      */
     private array $guzzleConfig = [];
 
-    /**
-     * Wait for status check flag
-     */
     private bool $waitForSend = true;
 
-    /**
-     * Number of status check tires
-     */
     private int $statusCheckTries = 10;
 
-    /**
-     * Url for sms send
-     */
     private string $sendDir = '/default/en_US/send.html';
 
-    /**
-     * Url for status check
-     */
     private string $statusDir = '/default/en_US/send_status.xml';
 
-    /**
-     * Status for sms that was not sent, but is in sending state
-     */
     public const STATUS_SENDING = 'sending';
 
-    /**
-     * Status for sms that was sent
-     */
     public const STATUS_SEND = 'send';
 
     /**
@@ -92,8 +54,6 @@ class HttpSms implements Sms
     }
 
     /**
-     * Send sms
-     *
      * @param string $number Phone number
      * @param string $message Text message
      * @return array<string, string>
@@ -125,8 +85,6 @@ class HttpSms implements Sms
     }
 
     /**
-     * Check if sms was sent
-     *
      * @param string $uniqueSessionIdentifier Goip unique session id
      */
     public function isSend(string $uniqueSessionIdentifier): bool
@@ -160,17 +118,11 @@ class HttpSms implements Sms
         return false;
     }
 
-    /**
-     * Set loop tries for status checking
-     */
     public function setStatusCheckTries(int $tries): void
     {
         $this->statusCheckTries = $tries;
     }
 
-    /**
-     * Set if send command must wait for status check
-     */
     public function setWaitForSend(bool $wait): void
     {
         $this->waitForSend = $wait;
@@ -186,8 +138,6 @@ class HttpSms implements Sms
     }
 
     /**
-     * Set guzzle client config
-     *
      * @param mixed[] $config
      */
     public function setGuzzleConfig(array $config): void
@@ -195,17 +145,12 @@ class HttpSms implements Sms
         $this->guzzleConfig = $config;
     }
 
-    /**
-     * Set guzzle request timeout
-     */
     public function setGuzzleTimeout(int $timeout): void
     {
         $this->guzzleTimeout = $timeout;
     }
 
     /**
-     * Parse response from goip
-     *
      * @return array<string, string>
      * @throws GoipException
      */
@@ -236,8 +181,6 @@ class HttpSms implements Sms
     }
 
     /**
-     * Parse Goip status list
-     *
      * @return array<string, string>
      */
     protected function parseStatusXml(string $response): array
@@ -264,9 +207,6 @@ class HttpSms implements Sms
         return (string) $value;
     }
 
-    /**
-     * Prepare goip command HTTP address
-     */
     protected function prepareAddress(string $dir): string
     {
         $host = $this->host;
@@ -279,8 +219,6 @@ class HttpSms implements Sms
     }
 
     /**
-     * Make request to Goip by guzzle client
-     *
      * @param mixed[] $query
      * @throws GoipException
      */

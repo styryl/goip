@@ -2,6 +2,7 @@
 
 namespace Pikart\Goip\Tests;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Pikart\Goip\Contracts\MessageDispatcher;
 use Pikart\Goip\Contracts\MessageListener;
 use Pikart\Goip\DefaultMessageDispatcher;
@@ -10,7 +11,7 @@ use Pikart\Goip\Message;
 use Pikart\Goip\Request;
 use Pikart\Goip\UdpServer;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class UdpServerTest extends TestCase
 {
     private string $host = '127.0.0.1';

@@ -8,9 +8,6 @@ use Pikart\Goip\Message;
 
 class NotSupportedMessage extends Message
 {
-    /**
-     * Ack message
-     */
     public function ack(): ?string
     {
         return null;

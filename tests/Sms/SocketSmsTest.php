@@ -36,7 +36,6 @@ class SocketSmsTest extends TestCase
             }
         };
 
-        // BulkSms
         $sms->sendBulkSmsRequest('test message');
         $this->goipServer->receiveFrom();
         $response = $sms->waitForResponse('BulkSms', 'PASSWORD');
@@ -57,7 +56,6 @@ class SocketSmsTest extends TestCase
             }
         };
 
-        // AuthenticationRequest
         $sms->sendAuthRequest();
         $this->goipServer->receiveFrom();
         $response = $sms->waitForResponse('Auth', 'SEND');
@@ -78,7 +76,6 @@ class SocketSmsTest extends TestCase
             }
         };
 
-        // NumberRequest
         $sms->sendNumberRequest('999999999');
         $this->goipServer->receiveFrom();
         $response = $sms->waitForResponse('SendNumber', 'OK');
@@ -99,7 +96,6 @@ class SocketSmsTest extends TestCase
             }
         };
 
-        // AuthenticationRequest
         $sms->sendEndRequest();
         $this->goipServer->receiveFrom();
         $response = $sms->waitForResponse('End', 'DONE');
@@ -124,7 +120,6 @@ class SocketSmsTest extends TestCase
             }
         };
 
-        // BulkSms
         $sms->sendBulkSmsRequest('test message');
         $sms->waitForResponse('BulkSms', 'PASSWORD');
     }
@@ -147,7 +142,6 @@ class SocketSmsTest extends TestCase
             }
         };
 
-        // BulkSms
         $sms->sendBulkSmsRequest('test message');
         $this->goipServer->receiveFrom(true);
         $response = $sms->waitForResponse('BulkSms', 'PASSWORD');

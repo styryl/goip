@@ -2,10 +2,11 @@
 
 namespace Pikart\Goip\Tests;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Pikart\Goip\Message;
 use Pikart\Goip\Request;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 class MessageTest extends TestCase
 {
     public function testItCanReturnRequest(): void

@@ -12,23 +12,14 @@ use React\Promise\PromiseInterface;
 
 class ReactServer extends Server
 {
-    /**
-     * The Socket instance
-     */
     private Socket $socket;
 
-    /**
-     * Run server
-     */
     public function run(): void
     {
         $loop = $this->createSocket();
         $loop->run();
     }
 
-    /**
-     * Create socket server
-     */
     private function createSocket(): LoopInterface
     {
         $loop = Loop::get();
@@ -48,23 +39,13 @@ class ReactServer extends Server
         return $loop;
     }
 
-    /**
-     * Fire when message arrives
-     */
     private function onMessage(string $message, string $address): void
     {
         $addressArr = explode(':', $address);
-
-        // Create request
         $request = new Request($message, $addressArr[0], (int) $addressArr[1]);
-
-        // Dispatch message from request
         $this->dispatch($request);
     }
 
-    /**
-     * Send message to client
-     */
     protected function send(string $message, string $host, int $port): void
     {
         $this->socket->send($message, $host . ':' . $port);

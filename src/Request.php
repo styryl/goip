@@ -6,24 +6,13 @@ namespace Pikart\Goip;
 
 class Request
 {
-    /**
-     * The raw message from client
-     */
     private string $buffer;
 
-    /**
-     * The remote host
-     */
     private string $host;
 
-    /**
-     * The remote port
-     */
     private int $port;
 
     /**
-     * Parsed attributes from raw buffer
-     *
      * @var array<string, string>
      */
     private array $attributes;
@@ -36,33 +25,22 @@ class Request
         $this->attributes = $this->parse($this->buffer);
     }
 
-    /**
-     * Get remote host
-     */
     public function host(): string
     {
         return $this->host;
     }
 
-    /**
-     * Get remote port
-     */
     public function port(): int
     {
         return $this->port;
     }
 
-    /**
-     * Get raw buffer
-     */
     public function buffer(): string
     {
         return $this->buffer;
     }
 
     /**
-     * Get all attributes
-     *
      * @return array<string, string>
      */
     public function all(): array
@@ -70,17 +48,11 @@ class Request
         return $this->attributes;
     }
 
-    /**
-     * Check if attribute exists
-     */
     public function has(string $key): bool
     {
         return array_key_exists($key, $this->attributes);
     }
 
-    /**
-     * Get concrete attribute from attributes
-     */
     public function get(string $key): ?string
     {
         return $this->has($key) ? $this->attributes[$key] : null;
@@ -92,8 +64,6 @@ class Request
     }
 
     /**
-     * Parse raw buffer to attributes
-     *
      * @return array<string, string>
      */
     private function parse(string $buffer): array

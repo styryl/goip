@@ -11,38 +11,21 @@ use Pikart\Goip\Exceptions\TimeoutException;
 
 class SocketSms implements Sms
 {
-    /**
-     * Goip host
-     */
     private string $host;
 
-    /**
-     * Goip port number
-     */
     private int $port;
 
-    /**
-     * Unique session id
-     */
     private string $uniqueSessionIdentifier;
 
-    /**
-     * Goip password
-     */
     private string $password;
 
     /**
-     * Connection options
-     *
      * @var array{timeout: int}
      */
     private array $options = [
         'timeout' => 5,
     ];
 
-    /**
-     * Socket instance
-     */
     private \Socket $socket;
 
     /**
@@ -79,8 +62,6 @@ class SocketSms implements Sms
     }
 
     /**
-     * Send sms
-     *
      * @param string $number Phone number
      * @param string $message Text message
      * @return array{sendid: string, telid: string, sms_no: string, raw: string}
@@ -109,9 +90,6 @@ class SocketSms implements Sms
         ];
     }
 
-    /**
-     * First step of sms sending
-     */
     protected function sendBulkSmsRequest(string $message): void
     {
         // GOIP message max length is 3000 bytes
@@ -120,27 +98,18 @@ class SocketSms implements Sms
         $this->sendRequest($message);
     }
 
-    /**
-     * Second step of sms sending
-     */
     protected function sendAuthRequest(): void
     {
         $message = 'PASSWORD ' . $this->uniqueSessionIdentifier . ' ' . $this->password;
         $this->sendRequest($message);
     }
 
-    /**
-     * Third step of sms sending
-     */
     protected function sendNumberRequest(string $number): void
     {
         $message = 'SEND ' . $this->uniqueSessionIdentifier . ' 1 ' . $number;
         $this->sendRequest($message);
     }
 
-    /**
-     * Last step of sms sending
-     */
     protected function sendEndRequest(): void
     {
         $message = 'DONE ' . $this->uniqueSessionIdentifier;
@@ -148,7 +117,6 @@ class SocketSms implements Sms
     }
 
     /**
-     * Create php socket
      * @throws SocketException
      */
     private function createSocket(): void
@@ -181,25 +149,17 @@ class SocketSms implements Sms
         }
     }
 
-    /**
-     * Get last socket error
-     */
     private function socketLastError(): string
     {
         return socket_strerror(socket_last_error($this->socket));
     }
 
-    /**
-     * Close socket connection
-     */
     private function close(): void
     {
         socket_close($this->socket);
     }
 
     /**
-     * Send request to goip
-     *
      * @throws SocketException
      */
     private function sendRequest(string $message): void
@@ -211,8 +171,6 @@ class SocketSms implements Sms
     }
 
     /**
-     * Wait for response from goip
-     *
      * @param string $request Request info step
      * @param string $response Expected response
      * @return string Return response from Goip if match with expected response

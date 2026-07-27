@@ -2,12 +2,13 @@
 
 namespace Pikart\Goip\Tests;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Pikart\Goip\Contracts\MessageDispatcher;
 use Pikart\Goip\Contracts\MessageFactory;
 use Pikart\Goip\Server;
 use Pikart\Goip\ServerFactory;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 class ServerFactoryTest extends TestCase
 {
     public function testItCanMakeServer(): void

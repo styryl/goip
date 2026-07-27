@@ -2,11 +2,12 @@
 
 namespace Pikart\Goip\Tests;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Pikart\Goip\Contracts\MessageListener;
 use Pikart\Goip\DefaultMessageDispatcher;
 use Pikart\Goip\Message;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class DefaultMessageDispatcherTest extends TestCase
 {
     private DefaultMessageDispatcher $messageDispatcher;

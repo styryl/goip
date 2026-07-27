@@ -6,14 +6,8 @@ namespace Pikart\Goip;
 
 class UdpServer extends Server
 {
-    /**
-     * The Socket instance
-     */
     private \Socket $socket;
 
-    /**
-     * Loop sleep interval in milliseconds
-     */
     private int $loopSleep = 5000;
 
     public function setLoopSleep(int $loopSleep): void
@@ -22,8 +16,6 @@ class UdpServer extends Server
     }
 
     /**
-     * Run server
-     *
      * @throws Exceptions\SocketException
      */
     public function run(): void
@@ -41,8 +33,6 @@ class UdpServer extends Server
     }
 
     /**
-     * Read from socket
-     *
      * @throws Exceptions\SocketException
      */
     private function receive(): ?Request
@@ -52,7 +42,6 @@ class UdpServer extends Server
         $port = 0;
         $rcvfrom = socket_recvfrom($this->socket, $buffer, 2048, 0, $host, $port);
 
-        // If there was an error
         if ($rcvfrom === false) {
             $errorCode = socket_last_error($this->socket);
 
@@ -74,8 +63,6 @@ class UdpServer extends Server
     }
 
     /**
-     * Send message to client
-     *
      * @throws Exceptions\SocketException
      */
     protected function send(string $message, string $host, int $port): void
@@ -105,26 +92,17 @@ class UdpServer extends Server
         socket_set_nonblock($this->socket);
     }
 
-    /**
-     * Close socket connection
-     */
     private function closeSocket(): void
     {
         socket_close($this->socket);
     }
 
-    /**
-     * Stop server
-     */
     public function stop(): void
     {
         parent::stop();
         $this->closeSocket();
     }
 
-    /**
-     * Get last socket error
-     */
     private function socketLastError(): string
     {
         return socket_strerror(socket_last_error($this->socket));

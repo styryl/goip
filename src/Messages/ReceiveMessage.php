@@ -8,35 +8,23 @@ use Pikart\Goip\Message;
 
 class ReceiveMessage extends Message
 {
-    /**
-     * Ack message
-     */
     public function ack(): ?string
     {
         return 'RECEIVE ' . $this->request()->get('receive') . ' OK';
     }
 
-    /**
-     * Receive count number
-     */
     public function receive(): ?int
     {
         return $this->request()
             ->getAsInt('receive');
     }
 
-    /**
-     * Sender phone number
-     */
     public function srcnum(): ?int
     {
         return $this->request()
             ->getAsInt('srcnum');
     }
 
-    /**
-     * Sender text message
-     */
     public function msg(): ?string
     {
         return $this->request()

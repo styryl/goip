@@ -13,14 +13,8 @@ use ReflectionException;
 
 class ServerFactory implements ServerFactoryContract
 {
-    /**
-     * Message factory implementation
-     */
     private MessageFactory $messageFactory;
 
-    /**
-     * Message dispatcher implementation
-     */
     private MessageDispatcher $messageDispatcher;
 
     public function __construct(MessageFactory $messageFactory, MessageDispatcher $messageDispatcher)
@@ -30,8 +24,6 @@ class ServerFactory implements ServerFactoryContract
     }
 
     /**
-     * Make Server instance
-     *
      * @param class-string $serverClass Implementation of Server
      * @param string $host Host to bind
      * @param int $port Port to bind
@@ -49,8 +41,6 @@ class ServerFactory implements ServerFactoryContract
     }
 
     /**
-     * Resolve Server instance
-     *
      * @param class-string $serverClass
      * @param mixed[] $args
      * @throws ReflectionException
@@ -69,11 +59,8 @@ class ServerFactory implements ServerFactoryContract
     }
 
     /**
-     * Resolve default Server instance
-     *
      * @param class-string $serverClass
      * @param mixed[] $args
-     *
      * @throws ReflectionException
      */
     public static function default(string $serverClass, string $host, int $port, array $args = []): Server

@@ -10,16 +10,12 @@ use Pikart\Goip\Contracts\MessageListener;
 class DefaultMessageDispatcher implements MessageDispatcher
 {
     /**
-     * The registered message listeners.
      * @var array<string, array<string, object>>
      */
     private array $listeners = [
         Message::class => [],
     ];
 
-    /**
-     * Register an message listener with the dispatcher for concrete message.
-     */
     public function listen(string $type, object $listener): string
     {
         if (! is_callable($listener) && ! $listener instanceof MessageListener) {
@@ -32,17 +28,12 @@ class DefaultMessageDispatcher implements MessageDispatcher
         return $listenerIdentifier;
     }
 
-    /**
-     * Register an message listener with the dispatcher for all messages
-     */
     public function listenAll(object $listener): string
     {
         return $this->listen(Message::class, $listener);
     }
 
     /**
-     * Get all register listeners
-     *
      * @return array<string, array<string, object>>
      */
     public function listeners(): array
@@ -50,9 +41,6 @@ class DefaultMessageDispatcher implements MessageDispatcher
         return $this->listeners;
     }
 
-    /**
-     * Remove all registered listeners
-     */
     public function removeAll(?string $type = null): void
     {
         if ($type !== null && array_key_exists($type, $this->listeners)) {
@@ -63,9 +51,6 @@ class DefaultMessageDispatcher implements MessageDispatcher
         $this->listeners = [];
     }
 
-    /**
-     * Remove listener by id
-     */
     public function remove(string $listenerIdentifier): void
     {
         foreach ($this->listeners as $type => $listeners) {
@@ -75,9 +60,6 @@ class DefaultMessageDispatcher implements MessageDispatcher
         }
     }
 
-    /**
-     * Get listener by id
-     */
     public function get(string $listenerIdentifier): ?object
     {
         foreach ($this->listeners as $listenerType) {
@@ -89,9 +71,6 @@ class DefaultMessageDispatcher implements MessageDispatcher
         return null;
     }
 
-    /**
-     * Dispatch messages to listeners
-     */
     public function dispatch(Message $message): void
     {
         $listeners = $this->listeners[Message::class];
@@ -114,9 +93,6 @@ class DefaultMessageDispatcher implements MessageDispatcher
         }
     }
 
-    /**
-     * Create unique id
-     */
     private function getHashId(object $callable): string
     {
         return spl_object_hash($callable);
