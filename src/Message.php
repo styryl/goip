@@ -6,11 +6,9 @@ namespace Pikart\Goip;
 
 abstract class Message
 {
-    private Request $request;
-
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
+    public function __construct(
+        private Request $request
+    ) {
     }
 
     public function request(): Request

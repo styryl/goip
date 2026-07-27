@@ -13,14 +13,10 @@ use ReflectionException;
 
 class ServerFactory implements ServerFactoryContract
 {
-    private MessageFactory $messageFactory;
-
-    private MessageDispatcher $messageDispatcher;
-
-    public function __construct(MessageFactory $messageFactory, MessageDispatcher $messageDispatcher)
-    {
-        $this->messageDispatcher = $messageDispatcher;
-        $this->messageFactory = $messageFactory;
+    public function __construct(
+        private MessageFactory $messageFactory,
+        private MessageDispatcher $messageDispatcher
+    ) {
     }
 
     /**

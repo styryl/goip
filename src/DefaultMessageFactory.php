@@ -19,7 +19,7 @@ class DefaultMessageFactory implements MessageFactory
     /**
      * @var array<string, class-string<Message>>
      */
-    protected array $messages = [
+    private const array MESSAGES = [
         'req' => RequestMessage::class,
         'state' => StateMessage::class,
         'record' => RecordMessage::class,
@@ -33,8 +33,8 @@ class DefaultMessageFactory implements MessageFactory
     {
         $type = (string) array_key_first($request->all());
 
-        if (array_key_exists($type, $this->messages)) {
-            return new $this->messages[$type]($request);
+        if (array_key_exists($type, self::MESSAGES)) {
+            return new (self::MESSAGES[$type])($request);
         }
 
         return new NotSupportedMessage($request);

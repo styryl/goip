@@ -6,23 +6,17 @@ namespace Pikart\Goip;
 
 class Request
 {
-    private string $buffer;
-
-    private string $host;
-
-    private int $port;
-
     /**
      * @var array<string, string>
      */
     private array $attributes;
 
-    public function __construct(string $buffer, string $host, int $port)
-    {
-        $this->buffer = $buffer;
-        $this->host = $host;
-        $this->port = $port;
-        $this->attributes = $this->parse($this->buffer);
+    public function __construct(
+        private string $buffer,
+        private string $host,
+        private int $port
+    ) {
+        $this->attributes = $this->parse($buffer);
     }
 
     public function host(): string

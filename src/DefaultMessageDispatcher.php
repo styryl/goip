@@ -25,6 +25,7 @@ class DefaultMessageDispatcher implements MessageDispatcher
 
         $listenerIdentifier = $this->getHashId($listener);
         $this->listeners[$type][$listenerIdentifier] = $listener;
+
         return $listenerIdentifier;
     }
 
@@ -41,10 +42,10 @@ class DefaultMessageDispatcher implements MessageDispatcher
         return $this->listeners;
     }
 
-    public function removeAll(?string $type = null): void
+    public function removeAll(?string $eventType = null): void
     {
-        if ($type !== null && array_key_exists($type, $this->listeners)) {
-            unset($this->listeners[$type]);
+        if ($eventType !== null && array_key_exists($eventType, $this->listeners)) {
+            unset($this->listeners[$eventType]);
             return;
         }
 

@@ -11,14 +11,6 @@ use Pikart\Goip\Exceptions\TimeoutException;
 
 class SocketSms implements Sms
 {
-    private string $host;
-
-    private int $port;
-
-    private string $uniqueSessionIdentifier;
-
-    private string $password;
-
     /**
      * @var array{timeout: int}
      */
@@ -37,17 +29,12 @@ class SocketSms implements Sms
      * @throws SocketException
      */
     public function __construct(
-        string $host,
-        int $port,
-        string $uniqueSessionIdentifier,
-        string $password,
+        private string $host,
+        private int $port,
+        private string $uniqueSessionIdentifier,
+        private string $password,
         ?array $options = null
     ) {
-        $this->host = $host;
-        $this->port = $port;
-        $this->uniqueSessionIdentifier = $uniqueSessionIdentifier;
-        $this->password = $password;
-
         if ($options !== null) {
             $this->options = array_merge($this->options, $options);
         }

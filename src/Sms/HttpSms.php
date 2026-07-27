@@ -10,14 +10,6 @@ use Pikart\Goip\Exceptions\GoipException;
 
 class HttpSms implements Sms
 {
-    private string $host;
-
-    private int $line;
-
-    private string $login;
-
-    private string $password;
-
     private Client $guzzleClient;
 
     private int $guzzleTimeout = 3;
@@ -35,9 +27,9 @@ class HttpSms implements Sms
 
     private string $statusDir = '/default/en_US/send_status.xml';
 
-    public const STATUS_SENDING = 'sending';
+    public const string STATUS_SENDING = 'sending';
 
-    public const STATUS_SEND = 'send';
+    public const string STATUS_SEND = 'send';
 
     /**
      * @param string $host Goip host for example: http://192.168.0.11
@@ -45,12 +37,12 @@ class HttpSms implements Sms
      * @param string $login Goip login
      * @param string $password Goip password
      */
-    public function __construct(string $host, int $line, string $login, string $password)
-    {
-        $this->host = $host;
-        $this->line = $line;
-        $this->login = $login;
-        $this->password = $password;
+    public function __construct(
+        private string $host,
+        private int $line,
+        private string $login,
+        private string $password
+    ) {
     }
 
     /**
@@ -110,7 +102,7 @@ class HttpSms implements Sms
                 }
 
                 sleep(1);
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
                 continue;
             }
         }
@@ -158,8 +150,8 @@ class HttpSms implements Sms
     {
         $response = trim($response);
         if (
-            strpos(strtolower($response), 'error') !== false ||
-            strpos(strtolower($response), 'sending') === false
+            str_contains(strtolower($response), 'error') ||
+            ! str_contains(strtolower($response), 'sending')
         ) {
             throw new GoipException($response);
         }
@@ -167,7 +159,7 @@ class HttpSms implements Sms
         $responseArr = explode(' ', $response);
         $identifier = end($responseArr);
 
-        if (strpos(strtolower($identifier), 'id') === false) {
+        if (! str_contains(strtolower($identifier), 'id')) {
             throw new GoipException('Sms id not found in response');
         }
 
@@ -211,7 +203,7 @@ class HttpSms implements Sms
     {
         $host = $this->host;
 
-        if (substr($this->host, -1) === '/') {
+        if (str_ends_with($this->host, '/')) {
             $host = substr($this->host, 0, -1);
         }
 
