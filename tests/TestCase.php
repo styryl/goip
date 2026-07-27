@@ -14,7 +14,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
         return $method->invokeArgs($object, $parameters);
     }
 
-    public function sampleBuffers(string $type): ? string
+    public function sampleBuffers(string $type): string
     {
         $buffers = [
             'req' => 'req:27;id:gateway_name;pass:gateway_password;num:;signal:29;gsm_status:LOGIN;voip_status:LOGOUT;voip_state:IDLE;remain_time:-1;imei:867495023958030;imsi:260060172091324;iccid:89480611000720913242;pro:POL;idle:11;disable_status:0;SMS_LOGIN:N;SMB_LOGIN:;CELLINFO:LAC:7E5,CELL ID:5E5B;CGATT:Y;',
@@ -28,10 +28,10 @@ class TestCase extends \PHPUnit\Framework\TestCase
             'other' => 'not supported message from goip?',
         ];
 
-        if (key_exists($type, $buffers)) {
+        if (array_key_exists($type, $buffers)) {
             return $buffers[$type];
         }
 
-        return null;
+        throw new \InvalidArgumentException(sprintf('Missing sample buffer "%s".', $type));
     }
 }

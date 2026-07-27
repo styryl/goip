@@ -21,37 +21,31 @@ class RecordMessageTest extends TestCase
 
     public function testItCanReturnAck(): void
     {
-        $this->assertEquals('RECORD ' . $this->request->get('record') . ' OK', $this->message->ack());
-        $this->assertIsInt($this->message->record());
+        $this->assertSame('RECORD 445 OK', $this->message->ack());
     }
 
     public function testItCanReturnRecord(): void
     {
-        $this->assertEquals($this->request->get('record'), $this->message->record());
-        $this->assertIsInt($this->message->record());
+        $this->assertSame(445, $this->message->record());
     }
 
     public function testItCanReturnId(): void
     {
-        $this->assertEquals($this->request->get('id'), $this->message->id());
-        $this->assertIsString($this->message->id());
+        $this->assertSame('c1', $this->message->id());
     }
 
     public function testItCanReturnPassword(): void
     {
-        $this->assertEquals($this->request->get('password'), $this->message->password());
-        $this->assertIsString($this->message->password());
+        $this->assertSame('gateway_password', $this->message->password());
     }
 
     public function testItCanReturnDir(): void
     {
-        $this->assertEquals($this->request->get('dir'), $this->message->dir());
-        $this->assertIsInt($this->message->dir());
+        $this->assertSame(2, $this->message->dir());
     }
 
     public function testItCanReturnNum(): void
     {
-        $this->assertEquals($this->request->get('num'), $this->message->num());
-        $this->assertIsString($this->message->num());
+        $this->assertSame('999999999', $this->message->num());
     }
 }

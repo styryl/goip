@@ -4,36 +4,52 @@ namespace Pikart\Goip\Tests;
 
 class GoipServer
 {
-    private $socket;
+    private \Socket $socket;
 
-    private int $step = 1;
+    public function __construct(
+        private string $host,
+        private int $port
+    ) {
+        $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
+        if ($socket === false) {
+            throw new \RuntimeException(socket_strerror(socket_last_error()));
+        }
 
-    private string $host;
+        $this->socket = $socket;
 
-    private int $port;
+        $bound = socket_bind($this->socket, $this->host, $this->port);
+        if ($bound === false) {
+            throw new \RuntimeException(socket_strerror(socket_last_error($this->socket)));
+        }
 
-    public function __construct(string $host, int $port)
-    {
-        $this->host = $host;
-        $this->port = $port;
-
-        $this->socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
-        socket_bind($this->socket, $this->host, $this->port);
-
-        socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, [
+        $optionSet = socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, [
             'sec' => 1,
             'usec' => 0,
         ]);
+        if ($optionSet === false) {
+            throw new \RuntimeException(socket_strerror(socket_last_error($this->socket)));
+        }
     }
 
     public function sendTo(string $message, ?string $host = null, ?int $port = null): int
     {
-        return socket_sendto($this->socket, $message, strlen($message), 0, $host ?? $this->host, $port ?? $this->port);
+        $sent = socket_sendto($this->socket, $message, strlen($message), 0, $host ?? $this->host, $port ?? $this->port);
+        if ($sent === false) {
+            throw new \RuntimeException(socket_strerror(socket_last_error($this->socket)));
+        }
+
+        return $sent;
     }
 
     public function receiveFrom(bool $sendError = false): string
     {
-        socket_recvfrom($this->socket, $buffer, 2048, 0, $fromip, $fromport);
+        $buffer = '';
+        $fromip = '';
+        $fromport = 0;
+        $received = socket_recvfrom($this->socket, $buffer, 2048, 0, $fromip, $fromport);
+        if ($received === false) {
+            throw new \RuntimeException(socket_strerror(socket_last_error($this->socket)));
+        }
 
         // BulkSMSRequest Format: MSG $sendid $length $msg\n
         if (strpos($buffer, 'MSG') !== false) {
@@ -66,11 +82,6 @@ class GoipServer
         }
 
         return $buffer;
-    }
-
-    public function BulkSMSRequest()
-    {
-
     }
 
     public function close(): void

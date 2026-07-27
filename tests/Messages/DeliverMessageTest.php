@@ -21,43 +21,36 @@ class DeliverMessageTest extends TestCase
 
     public function testItCanReturnAck(): void
     {
-        $this->assertEquals('DELIVER ' . $this->request->get('deliver') . ' OK', $this->message->ack());
-        $this->assertIsInt($this->message->deliver());
+        $this->assertSame('DELIVER 429 OK', $this->message->ack());
     }
 
     public function testItCanReturnDeliver(): void
     {
-        $this->assertEquals($this->request->get('deliver'), $this->message->deliver());
-        $this->assertIsInt($this->message->deliver());
+        $this->assertSame(429, $this->message->deliver());
     }
 
     public function testItCanReturnId(): void
     {
-        $this->assertEquals($this->request->get('id'), $this->message->id());
-        $this->assertIsString($this->message->id());
+        $this->assertSame('c1', $this->message->id());
     }
 
     public function testItCanReturnPassword(): void
     {
-        $this->assertEquals($this->request->get('password'), $this->message->password());
-        $this->assertIsString($this->message->password());
+        $this->assertSame('gateway_password', $this->message->password());
     }
 
     public function testItCanReturnSmsNo(): void
     {
-        $this->assertEquals($this->request->get('sms_no'), $this->message->smsNo());
-        $this->assertIsInt($this->message->smsNo());
+        $this->assertSame(3, $this->message->smsNo());
     }
 
     public function testItCanReturnState(): void
     {
-        $this->assertEquals($this->request->get('state'), $this->message->state());
-        $this->assertIsInt($this->message->state());
+        $this->assertSame(0, $this->message->state());
     }
 
     public function testItCanReturnNum(): void
     {
-        $this->assertEquals($this->request->get('num'), $this->message->num());
-        $this->assertIsString($this->message->num());
+        $this->assertSame('999999999', $this->message->num());
     }
 }

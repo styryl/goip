@@ -21,19 +21,16 @@ class ExpiryMessageTest extends TestCase
 
     public function testItCanReturnAck(): void
     {
-        $this->assertEquals('EXPIRY ' . $this->request->get('expiry') . ' OK', $this->message->ack());
-        $this->assertIsInt($this->message->expiry());
+        $this->assertSame('EXPIRY 1785167081 OK', $this->message->ack());
     }
 
     public function testItCanReturnExpiry(): void
     {
-        $this->assertEquals($this->request->get('expiry'), $this->message->expiry());
-        $this->assertIsInt($this->message->expiry());
+        $this->assertSame(1785167081, $this->message->expiry());
     }
 
     public function testItCanReturnExp(): void
     {
-        $this->assertEquals($this->request->get('exp'), $this->message->exp());
-        $this->assertIsInt($this->message->exp());
+        $this->assertSame(0, $this->message->exp());
     }
 }

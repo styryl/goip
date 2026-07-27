@@ -21,109 +21,91 @@ class RequestMessageTest extends TestCase
 
     public function testItCanReturnAck(): void
     {
-        $this->assertEquals('reg:' . $this->request->get('req') . ';status:0;', $this->message->ack());
-        $this->assertIsInt($this->message->req());
+        $this->assertSame('reg:27;status:0;', $this->message->ack());
     }
 
     public function testItCanReturnReq(): void
     {
-        $this->assertEquals($this->request->get('req'), $this->message->req());
-        $this->assertIsInt($this->message->req());
+        $this->assertSame(27, $this->message->req());
     }
 
     public function testItCanReturnId(): void
     {
-        $this->assertEquals($this->request->get('id'), $this->message->id());
-        $this->assertIsString($this->message->id());
+        $this->assertSame('gateway_name', $this->message->id());
     }
 
     public function testItCanReturnPassword(): void
     {
-        $this->assertEquals($this->request->get('pass'), $this->message->password());
-        $this->assertIsString($this->message->password());
+        $this->assertSame('gateway_password', $this->message->password());
     }
 
     public function testItCanReturnNum(): void
     {
-        $this->assertEquals($this->request->get('num'), $this->message->num());
-        $this->assertIsString($this->message->num());
+        $this->assertSame('', $this->message->num());
     }
 
     public function testItCanReturnSignal(): void
     {
-        $this->assertEquals($this->request->get('signal'), $this->message->signal());
-        $this->assertIsInt($this->message->signal());
+        $this->assertSame(29, $this->message->signal());
     }
 
     public function testItCanReturnGsmStatus(): void
     {
-        $this->assertEquals($this->request->get('gsm_status'), $this->message->gsmStatus());
-        $this->assertIsString($this->message->gsmStatus());
+        $this->assertSame('LOGIN', $this->message->gsmStatus());
     }
 
     public function testItCanReturnVoipStatus(): void
     {
-        $this->assertEquals($this->request->get('voip_status'), $this->message->voipStatus());
-        $this->assertIsString($this->message->voipStatus());
+        $this->assertSame('LOGOUT', $this->message->voipStatus());
     }
 
     public function testItCanReturnVoipState(): void
     {
-        $this->assertEquals($this->request->get('voip_state'), $this->message->voipState());
-        $this->assertIsString($this->message->voipState());
+        $this->assertSame('IDLE', $this->message->voipState());
     }
 
     public function testItCanReturnRemainTime(): void
     {
-        $this->assertEquals($this->request->get('remain_time'), $this->message->remainTime());
-        $this->assertIsInt($this->message->remainTime());
+        $this->assertSame(-1, $this->message->remainTime());
     }
 
     public function testItCanReturnImei(): void
     {
-        $this->assertEquals($this->request->get('imei'), $this->message->imei());
-        $this->assertIsInt($this->message->imei());
+        $this->assertSame(867495023958030, $this->message->imei());
     }
 
     public function testItCanReturnPro(): void
     {
-        $this->assertEquals($this->request->get('pro'), $this->message->pro());
-        $this->assertIsString($this->message->pro());
+        $this->assertSame('POL', $this->message->pro());
     }
 
     public function testItCanReturnIdle(): void
     {
-        $this->assertEquals($this->request->get('idle'), $this->message->idle());
-        $this->assertIsInt($this->message->idle());
+        $this->assertSame(11, $this->message->idle());
     }
 
     public function testItCanReturnDisableStatus(): void
     {
-        $this->assertEquals($this->request->get('disable_status'), $this->message->disableStatus());
-        $this->assertIsInt($this->message->disableStatus());
+        $this->assertSame(0, $this->message->disableStatus());
     }
 
     public function testItCanReturnSmsLogin(): void
     {
-        $this->assertEquals($this->request->get('sms_login'), $this->message->smsLogin());
-        $this->assertIsString($this->message->smsLogin());
+        $this->assertSame('N', $this->message->smsLogin());
     }
 
     public function testItCanReturnSmbLogin(): void
     {
-        $this->assertEquals($this->request->get('smb_login'), $this->message->smbLogin());
-        $this->assertIsString($this->message->smbLogin());
+        $this->assertSame('', $this->message->smbLogin());
     }
 
     public function testItCanReturnCellinfo(): void
     {
-        $this->assertEquals($this->request->get('cellinfo'), $this->message->cellinfo());
-        $this->assertIsString($this->message->cellinfo());
+        $this->assertSame('LAC:7E5,CELL ID:5E5B', $this->message->cellinfo());
     }
 
     public function testItCanReturnCgatt(): void
     {
-        $this->assertEquals($this->request->get('cgatt'), $this->message->cgatt());
-        $this->assertIsString($this->message->cgatt());
+        $this->assertSame('Y', $this->message->cgatt());
     }
 }

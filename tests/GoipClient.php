@@ -4,33 +4,48 @@ namespace Pikart\Goip\Tests;
 
 class GoipClient
 {
-    private $socket;
+    private \Socket $socket;
 
-    private string $host = '127.0.0.1';
+    public function __construct(
+        private string $host,
+        private int $port
+    ) {
+        $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
+        if ($socket === false) {
+            throw new \RuntimeException(socket_strerror(socket_last_error()));
+        }
 
-    private int $port = 333;
+        $this->socket = $socket;
 
-    public function __construct(string $host, int $port)
-    {
-        $this->host = $host;
-        $this->port = $port;
-
-        $this->socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
-
-        socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, [
+        $optionSet = socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, [
             'sec' => 1,
             'usec' => 0,
         ]);
+        if ($optionSet === false) {
+            throw new \RuntimeException(socket_strerror(socket_last_error($this->socket)));
+        }
     }
 
     public function sendTo(string $message, ?string $host = null, ?int $port = null): int
     {
-        return socket_sendto($this->socket, $message, strlen($message), 0, $host ?? $this->host, $port ?? $this->port);
+        $sent = socket_sendto($this->socket, $message, strlen($message), 0, $host ?? $this->host, $port ?? $this->port);
+        if ($sent === false) {
+            throw new \RuntimeException(socket_strerror(socket_last_error($this->socket)));
+        }
+
+        return $sent;
     }
 
     public function receiveFrom(): string
     {
-        socket_recvfrom($this->socket, $buffer, 2048, 0, $fromip, $fromport);
+        $buffer = '';
+        $fromip = '';
+        $fromport = 0;
+        $received = socket_recvfrom($this->socket, $buffer, 2048, 0, $fromip, $fromport);
+        if ($received === false) {
+            throw new \RuntimeException(socket_strerror(socket_last_error($this->socket)));
+        }
+
         return $buffer;
     }
 

@@ -15,22 +15,22 @@ class RequestTest extends TestCase
 
     public function testItCanReturnHost(): void
     {
-        $this->assertIsString($this->request->host());
+        $this->assertSame('0.0.0.0', $this->request->host());
     }
 
     public function testItCanReturnPort(): void
     {
-        $this->assertIsInt($this->request->port());
+        $this->assertSame(0, $this->request->port());
     }
 
     public function testItCanReturnBuffer(): void
     {
-        $this->assertEquals($this->sampleBuffers('req'), $this->request->buffer());
+        $this->assertSame($this->sampleBuffers('req'), $this->request->buffer());
     }
 
     public function testItCanParseBufferFromString(): void
     {
-        $this->assertIsArray($this->request->all());
+        $this->assertSame('gateway_name', $this->request->all()['id']);
     }
 
     public function testItShouldReturnTrueIfParsedBufferHasKey(): void
@@ -45,7 +45,7 @@ class RequestTest extends TestCase
 
     public function testItShouldReturnStringValueIfParsedBufferHasAttribute(): void
     {
-        $this->assertEquals('27', $this->request->get('req'));
+        $this->assertSame('27', $this->request->get('req'));
     }
 
     public function testItShouldReturnNullValueIfParsedBufferDoesntHasAttribute(): void
@@ -61,7 +61,7 @@ class RequestTest extends TestCase
             0
         );
 
-        $this->assertEquals('Hi; how are you?', $request->get('msg'));
+        $this->assertSame('Hi; how are you?', $request->get('msg'));
         $this->assertFalse($request->has(' how are you?'));
     }
 
@@ -73,8 +73,8 @@ class RequestTest extends TestCase
             0
         );
 
-        $this->assertEquals('123', $request->get('srcnum'));
-        $this->assertEquals('1', $request->get('id'));
-        $this->assertEquals('Hi;srcnum:fake;id:other', $request->get('msg'));
+        $this->assertSame('123', $request->get('srcnum'));
+        $this->assertSame('1', $request->get('id'));
+        $this->assertSame('Hi;srcnum:fake;id:other', $request->get('msg'));
     }
 }

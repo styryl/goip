@@ -21,37 +21,31 @@ class ReceiveMessageTest extends TestCase
 
     public function testItCanReturnAck(): void
     {
-        $this->assertEquals('RECEIVE ' . $this->request->get('receive') . ' OK', $this->message->ack());
-        $this->assertIsInt($this->message->receive());
+        $this->assertSame('RECEIVE 441 OK', $this->message->ack());
     }
 
     public function testItCanReturnReceive(): void
     {
-        $this->assertEquals($this->request->get('receive'), $this->message->receive());
-        $this->assertIsInt($this->message->receive());
+        $this->assertSame(441, $this->message->receive());
     }
 
     public function testItCanReturnId(): void
     {
-        $this->assertEquals($this->request->get('id'), $this->message->id());
-        $this->assertIsString($this->message->id());
+        $this->assertSame('c1', $this->message->id());
     }
 
     public function testItCanReturnPassword(): void
     {
-        $this->assertEquals($this->request->get('password'), $this->message->password());
-        $this->assertIsString($this->message->password());
+        $this->assertSame('gateway_password', $this->message->password());
     }
 
     public function testItCanReturnSrcnum(): void
     {
-        $this->assertEquals($this->request->get('srcnum'), $this->message->srcnum());
-        $this->assertIsInt($this->message->srcnum());
+        $this->assertSame(100, $this->message->srcnum());
     }
 
     public function testItCanReturnMsg(): void
     {
-        $this->assertEquals($this->request->get('msg'), $this->message->msg());
-        $this->assertIsString($this->message->msg());
+        $this->assertSame('This is sample sms message', $this->message->msg());
     }
 }

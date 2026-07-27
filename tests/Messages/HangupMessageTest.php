@@ -21,37 +21,31 @@ class HangupMessageTest extends TestCase
 
     public function testItCanReturnAck(): void
     {
-        $this->assertEquals('HANGUP ' . $this->request->get('hangup') . ' OK', $this->message->ack());
-        $this->assertIsInt($this->message->hangup());
+        $this->assertSame('HANGUP 442 OK', $this->message->ack());
     }
 
     public function testItCanReturnHangup(): void
     {
-        $this->assertEquals($this->request->get('hangup'), $this->message->hangup());
-        $this->assertIsInt($this->message->hangup());
+        $this->assertSame(442, $this->message->hangup());
     }
 
     public function testItCanReturnId(): void
     {
-        $this->assertEquals($this->request->get('id'), $this->message->id());
-        $this->assertIsString($this->message->id());
+        $this->assertSame('c1', $this->message->id());
     }
 
     public function testItCanReturnPassword(): void
     {
-        $this->assertEquals($this->request->get('password'), $this->message->password());
-        $this->assertIsString($this->message->password());
+        $this->assertSame('gateway_password', $this->message->password());
     }
 
     public function testItCanReturnNum(): void
     {
-        $this->assertEquals($this->request->get('num'), $this->message->num());
-        $this->assertIsString($this->message->num());
+        $this->assertSame('', $this->message->num());
     }
 
     public function testItCanReturnCause(): void
     {
-        $this->assertEquals($this->request->get('cause'), $this->message->cause());
-        $this->assertIsInt($this->message->cause());
+        $this->assertSame(16, $this->message->cause());
     }
 }

@@ -21,31 +21,26 @@ class StateMessageTest extends TestCase
 
     public function testItCanReturnAck(): void
     {
-        $this->assertEquals('STATE ' . $this->request->get('state') . ' OK', $this->message->ack());
-        $this->assertIsInt($this->message->state());
+        $this->assertSame('STATE 446 OK', $this->message->ack());
     }
 
     public function testItCanReturnState(): void
     {
-        $this->assertEquals($this->request->get('state'), $this->message->state());
-        $this->assertIsInt($this->message->state());
+        $this->assertSame(446, $this->message->state());
     }
 
     public function testItCanReturnId(): void
     {
-        $this->assertEquals($this->request->get('id'), $this->message->id());
-        $this->assertIsString($this->message->id());
+        $this->assertSame('c1', $this->message->id());
     }
 
     public function testItCanReturnPassword(): void
     {
-        $this->assertEquals($this->request->get('password'), $this->message->password());
-        $this->assertIsString($this->message->password());
+        $this->assertSame('gateway_password', $this->message->password());
     }
 
     public function testItCanReturngsmRemainState(): void
     {
-        $this->assertEquals($this->request->get('gsm_remain_state'), $this->message->gsmRemainState());
-        $this->assertIsString($this->message->gsmRemainState());
+        $this->assertSame('DIALING:999999999', $this->message->gsmRemainState());
     }
 }
